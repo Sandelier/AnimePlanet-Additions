@@ -95,7 +95,7 @@
     width: 1130px;
 
 
-    overflow: scroll;
+    overflow-y: scroll;
 
     max-height: calc(80vh - 15px) !important;
 
