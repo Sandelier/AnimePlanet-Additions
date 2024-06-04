@@ -23,7 +23,7 @@ You can disable/enable features in the options page of the addon. Options page i
 Options page is gonna be redesigned sooner or later.
 
 ### Acknowledgements
-* **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used in "Extra manga data" feature to fetch manga data
+* **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used for "Extra manga data" feature to fetch manga data
 
 
 ## License
@@ -37,11 +37,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
   <details>
     <summary>Extra pages</summary>
     Allows you to load more mangas/animes into one page by loading extra pages.
-  </details>
-
-  <details>
-    <summary>Tag blocker</summary>
-    Removes mangas/animes that contains an tag you dont like.
   </details>
 
   <details>
@@ -86,7 +81,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
   <details>
     <summary>Extra manga data</summary>
-    Adds an button to fetch mangaupdate's data and add it to the manga page. In example description or alternative titles since animeplanet usually dosen't say the raw name
+    Adds an button to fetch mangaupdate's data and add it to the manga page. In example description or alternative titles since animeplanet usually doesn't say the raw name
   </details>
 
 </details>

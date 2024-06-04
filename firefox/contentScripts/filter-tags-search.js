@@ -35,15 +35,27 @@
         }
     }
 
+    const showMoreTagsEle = document.querySelector('#advanced_filter_tags');
+    const moreTagsEle = document.querySelector('#advanced_more_tags');
+
     function searchFunctionality(searchElement, tags, tagMap) {
         searchElement.addEventListener('input', debounce((e) => {
-            const query = e.target.value.toLowerCase();
+            const query = e.target.value.toLowerCase().trim();
             tags.forEach(tag => tag.style.display = 'none');
             tagMap.forEach((tag, tagName) => {
                 if (tagName.includes(query)) {
                     tag.style.display = 'inline-block';
                 }
             });
+
+            showMoreTagsEle.style.display = "none";
+            moreTagsEle.style.display = "block";
+
+            if (query.length <= 0) {
+                showMoreTagsEle.style.display = "";
+                moreTagsEle.style.display = "";
+            }
+
         }, 300));
     }
 
