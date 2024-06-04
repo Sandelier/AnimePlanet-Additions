@@ -1,18 +1,30 @@
 
 # AnimePlanet Additions
 Adding new features / fixing minor inconveniences that i have found in animeplanet. 
-You can disable/enable features in the options page of the addon. Options page in firefox is at about:addons and in chromium its browser://extensions.
 
 ## Installation
 
-When installed you need to allow the addon to operate in animeplanet url. And if you want to use "Extra manga data" script that uses mangaupdates api then you need to also allow the script to work in mangaupdates url.
+**Permissions:**
+- You need to allow the extension to operate in Animeplanet's url so that we can inject content scripts.
+- If you want to use the "Extra manga data" script then you need to also allow the extension to operate in mangaupdates api url.
 
 ### Firefox
-You can find the extension for Firefox on Mozilla's add-on page: [AnimePlanet Additions](https://github.com/Sandelier/AnimePlanet-Additions)
-In the extensions list you need to allow the addon access to animeplanet url. Otherwise the extension wont be able to inject content scripts to the page which basically means it wont work.
+Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https://github.com/Sandelier/AnimePlanet-Additions)
 
-### Chromium
-For Chromium browsers like Chrome or brave, you need to download the zip file from [Releases](https://github.com/Sandelier/AnimePlanet-Additions/releases/latest) and manually add it to Chromium since Google wants me to pay them if i want it to be published in their own web store.
+### Chromium (Chrome, brave, etc)
+1. Download the zip file from [Releases](https://github.com/Sandelier/AnimePlanet-Additions/releases/latest).
+2. Manually add the zip file to your extension manager. You can typically find the extension manager in "browser://extensions/". You might need to enable developer mode to manually install zip files.
+
+(I would want to add it to Google's web store, but they want me to pay them for me to give them software I made for free for everyone to use so maybe some other day i might add it.)
+
+
+### Options page
+You can disable/enable features in the options page of the addon. Options page in firefox is at about:addons and in chromium its browser://extensions.
+Options page is gonna be redesigned sooner or later.
+
+### Acknowledgements
+* **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used in "Extra manga data" feature to fetch manga data
+
 
 ## License
 
@@ -65,6 +77,16 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
   <details>
     <summary>List entry remover</summary>
     Makes it that you can click the list to remove the entry from custom list in "Add to new custom list"
+  </details>
+
+  <details>
+    <summary>Auto filters</summary>
+    Automatically adds filters
+  </details>
+
+  <details>
+    <summary>Extra manga data</summary>
+    Adds an button to fetch mangaupdate's data and add it to the manga page. In example description or alternative titles since animeplanet usually dosen't say the raw name
   </details>
 
 </details>
