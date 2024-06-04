@@ -5,13 +5,13 @@ You can disable/enable features in the options page of the addon. Options page i
 
 ## Installation
 
+When installed you need to allow the addon to operate in animeplanet url. And if you want to use "Extra manga data" script that uses mangaupdates api then you need to also allow the script to work in mangaupdates url.
+
 ### Firefox
 You can find the extension for Firefox on Mozilla's add-on page: [AnimePlanet Additions](https://github.com/Sandelier/AnimePlanet-Additions)
 
 ### Chromium
 I am in the process of changing the code to make it work on chromium.
-
-In the extensions list you need to allow the addon to work in animeplanet url.
 
 ## License
 

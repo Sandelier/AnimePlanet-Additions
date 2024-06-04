@@ -110,6 +110,9 @@ function createScriptsPage(contentScripts) {
                 if (Array.isArray(data)) {
                     textarea.setAttribute('dataType', 'array');
                     textarea.value = data.join('\n');
+                } else if (typeof data === 'object') {
+                    textarea.setAttribute('dataType', 'object');
+                    textarea.value = JSON.stringify(data, null, 2);
                 } else {
                     textarea.setAttribute('dataType', 'int');
                     textarea.value = data;
@@ -183,6 +186,14 @@ document.getElementById('overlay-close').addEventListener("click", function() {
         if (intValue > 0) {
             localStorageData[dataName] = intValue;
             localStorage.setItem(dataName, JSON.stringify(localStorageData[dataName]));
+        }
+    } else if (dataType === "object") {
+        try {
+            const jsonObject = JSON.parse(textareaContent);
+            localStorageData[dataName] = jsonObject;
+            localStorage.setItem(dataName, JSON.stringify(localStorageData[dataName]));
+        } catch (e) {
+            console.error("Invalid JSON data:", e);
         }
     }
 });

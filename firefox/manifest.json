@@ -16,7 +16,9 @@
     },
 
     "host_permissions": [
-      "https://www.anime-planet.com/*"
+      "https://www.anime-planet.com/*",
+      "https://api.mangaupdates.com/v1/series/*"
+
     ],
 
     "options_ui": {

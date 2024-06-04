@@ -4,8 +4,17 @@
 /* Initilization */
 browser.runtime.onInstalled.addListener(() => {
     const defaultSettings = {
-        disallowedTags: ["Sexual Content", "Mature Themes", "Emotional Abuse"],
         pagesToSearch: 1,
+
+        autoFilters: {
+            "tags": {
+              "Sexual Content": "-",
+              "Mature Themes": "+",
+              "Emotional Abuse": "-"
+            },
+            "other": ["Completed"],
+            "mylist": ["Read", "Reading"]
+        },
     
         contentScripts: {
             "helper-parseTooltips.js": { 
@@ -30,13 +39,6 @@ browser.runtime.onInstalled.addListener(() => {
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
                 ],
                 changeableData: "pagesToSearch"
-            },
-            "permanentTagBlocking.js": { 
-                formattedName: "Tag blocker",
-                enabled: false,
-                description: "Removes mangas/animes that contains an tag you dont like.",
-                allowedUrls: [],
-                changeableData: "disallowedTags"
             },
             "filter-applyBtn-AlwaysOn.js": {
                 formattedName: "Apply button shown",
@@ -82,9 +84,33 @@ browser.runtime.onInstalled.addListener(() => {
                     "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
                 ],
                 wipText: "Currently the script can only handle lists that dont have extra pages."
+            },
+            "filter-autoFilter.js": { 
+                formattedName: "Auto filters",
+                enabled: false,
+                description: "Adds filters automatically",
+                allowedUrls: [],
+                changeableData: "autoFilters"
+            },
+            "getMangaupdatesData.js": { 
+                formattedName: "Extra manga data",
+                enabled: false,
+                description: "Adds an button to fetch mangaupdate's data and add it to the manga page.",
+                allowedUrls: [
+                    "https://www.anime-planet.com/manga/"
+                ]
             }
         }
     };
+
+    function resetLocalStorage() {
+        Object.keys(defaultSettings).forEach(key => {
+          localStorage.setItem(key, JSON.stringify(defaultSettings[key]));
+        });
+    }
+    
+    window.resetLocalStorage = resetLocalStorage;
+    
     
     Object.keys(defaultSettings).forEach(key => {
         if (!localStorage.getItem(key)) {
@@ -193,6 +219,20 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 console.warn('Missing requestType for getLocalStorageValue');
             }
             break;
+        case 'getMangaInfo':
+            if (message.mangaName) {
+                (async () => {
+                    try {
+                        const mangaInfo = await getMangaInfo(message.mangaName);
+                        sendResponse({ mangaInfo });
+                    } catch (error) {
+                        console.error('Error fetching manga info:', error);
+                        sendResponse({ error: 'Failed to fetch manga info' });
+                    }
+                })();
+            } else {
+                console.warn('Missing manga name for getMangaInfo');
+            }
 
         default:
             console.warn('Unknown action:', message.action);
@@ -239,3 +279,110 @@ const onActivatedHandler = (activeInfo) => {
   
 
 browser.tabs.onActivated.addListener(onActivatedHandler);
+
+
+
+
+
+
+
+
+
+// Mangaupdates api calls. Used for "getAllNames.js"
+// The background script can call the api without worrying about cors unlike if you were to do it in content script.
+
+
+// Search manga using id.
+// We need to fetch again using the id we get from fetchmangabyname because the received data dosent contain like associations.
+async function fetchMangaById(id) {
+    const url = `https://api.mangaupdates.com/v1/series/${id}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+// Search manga using name.
+
+async function fetchMangaByName(name) {
+  const url = "https://api.mangaupdates.com/v1/series/search";
+  const payload = {
+    "search": name,
+    "per_page": 2,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+}
+
+
+
+
+let lastCallTime = 0;
+
+async function getMangaInfo(searchName) {
+  const now = Date.now();
+  
+  // just an simple rate limit of 10s.
+  if (now - lastCallTime < 10000) { 
+    return JSON.stringify({ status: "rateLimit" });
+  }
+  
+  lastCallTime = now;
+
+  try {
+    const searchData = await fetchMangaByName(searchName);
+
+    if (!searchData) {
+      console.log("Failed to fetch manga by name. Exiting...");
+      return JSON.stringify({ status: "error" });
+    }
+
+    const firstMangaId = searchData.results[0]?.record.series_id;
+
+    if (!firstMangaId) {
+      console.log("No manga found with the given name.");
+      return JSON.stringify({ status: "error" });
+    }
+
+    const mangaByIdData = await fetchMangaById(firstMangaId);
+
+    console.log(mangaByIdData);
+
+    return JSON.stringify({ status: "ok", data: mangaByIdData });
+
+  } catch (error) {
+    console.error('An error occurred:', error);
+    return JSON.stringify({ status: "error" });
+  }
+}
