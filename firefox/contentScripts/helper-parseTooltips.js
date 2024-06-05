@@ -21,7 +21,6 @@ function parseTooltips(dispatch = false) {
         tooltipData.push({ tooltip: tooltip, parsedTitle: parsedTitle });
     });
 
-    // Useful for like permanent tag blocking so it can remove the entries again.
     if (dispatch === true) {
         document.dispatchEvent(new Event('newEntries'));
     }

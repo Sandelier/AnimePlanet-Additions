@@ -28,7 +28,13 @@
 
     "icons": {
       "128": "icon.svg"
-    }
+    },
 
-  }
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "animeplanet-additions@sandelier.com",
+        "strict_min_version": "126.0.1"
+      }
+    }
+}
   
