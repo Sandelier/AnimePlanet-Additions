@@ -17,6 +17,12 @@ browser.runtime.onInstalled.addListener(() => {
         },
     
         contentScripts: {
+            "helper-trackScripts.js": { 
+                formattedName: "Track scripts",
+                enabled: true,
+                description: "Helper script to keep track of current scripts in the page.",
+                allowedUrls: []
+            },
             "helper-parseTooltips.js": { 
                 formattedName: "Tooltip parse",
                 enabled: true,
@@ -136,6 +142,21 @@ const injectedScripts = new Map();
 
 async function executeContentScript(url, tabId) {
     try {
+
+
+        // If injected scripts is empty it might mean that background script has went idle so we have to ask the trackscripts helper if there are content scripts in the page
+        if (!injectedScripts.has(tabId)) {
+            try {
+                const response = await browser.tabs.sendMessage(tabId, { action: 'getInjectedScripts'})
+                if (response && response.scripts) {
+                    injectedScripts.set(tabId, new Set(response.scripts));
+                    console.log(injectedScripts.get(tabId));
+                }
+            } catch (error) {
+                console.error('Error retrieving injected scripts.', error);
+            }
+        }
+
         const contentScripts = JSON.parse(localStorage.getItem('contentScripts'));
 
         if (!injectedScripts.has(tabId)) {

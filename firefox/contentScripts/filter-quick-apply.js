@@ -3,6 +3,8 @@
 
 (function() {
 
+    injectedScripts.push("filter-quick-apply.js");
+
     function createQuickApplyBtn() {
         const quickApplyBtn = document.createElement("button");
         quickApplyBtn.className = "pillApply cta";

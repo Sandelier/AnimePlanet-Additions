@@ -1,6 +1,9 @@
 
 
 (function() {
+
+    injectedScripts.push("filter-tags-search.js");
+
     function createSearchElement() {
         const searchElement = document.createElement("input");
 

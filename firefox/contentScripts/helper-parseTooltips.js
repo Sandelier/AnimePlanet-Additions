@@ -4,6 +4,8 @@
 
 let tooltipData = [];
 
+injectedScripts.push("helper-parseTooltips.js");
+
 function parseTooltips(dispatch = false) {
     tooltipData = [];
     let tooltips = document.querySelectorAll('.card a');

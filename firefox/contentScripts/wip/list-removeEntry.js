@@ -4,6 +4,8 @@
 
 (function() {
 
+    injectedScripts.push("wip/list-removeEntry.js");
+
 	// Injecting the fetch interceptor to document.
 	var script = document.createElement('script');
 

@@ -1,6 +1,8 @@
 
 
 
+injectedScripts.push("helper-filter-newTabEntries.js");
+
 (function() {
 
     // the tabsui has an set width at start so we have to change it since otherwise it will wrap if we add even one more extra entry..

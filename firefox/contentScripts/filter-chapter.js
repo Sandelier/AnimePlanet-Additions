@@ -3,6 +3,8 @@
 
 (function() {
 
+    injectedScripts.push("filter-chapter.js");
+
     const filterTab = `
     <li id="tab-chapters" role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="chapters" aria-labelledby="ui-id-11" aria-selected="false" aria-expanded="false">
       <a href="#chapters" tabindex="-1" class="ui-tabs-anchor" id="ui-id-11">Chapters</a>

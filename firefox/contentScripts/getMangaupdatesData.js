@@ -1,6 +1,9 @@
 
 
 (function() {
+
+	injectedScripts.push("getMangaupdatesData.js");
+
 	const mangaNameElement = document.querySelector('#siteContainer > h1');
 
 	if (mangaNameElement) {

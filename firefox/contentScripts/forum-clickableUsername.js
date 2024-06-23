@@ -2,6 +2,8 @@
 
 
 (function() {
+
+    injectedScripts.push("forum-clickableUsername.js");
     
     const usernameElement = document.querySelector('.memberHeader-nameWrapper > span.username');
     

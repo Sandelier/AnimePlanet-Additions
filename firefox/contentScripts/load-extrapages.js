@@ -4,6 +4,8 @@
 
 (function() {
 
+    injectedScripts.push("load-extrapages.js");
+
     function getNextPageBtn() {
 
         const selectedPage = document.querySelector('.nav li.selected');

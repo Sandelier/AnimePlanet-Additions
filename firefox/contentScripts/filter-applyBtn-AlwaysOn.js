@@ -5,6 +5,8 @@
 
 (function() {
 
+    injectedScripts.push("filter-applyBtn-AlwaysOn.js");
+
     const styleElement = document.createElement('style');
     
     styleElement.textContent = `

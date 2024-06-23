@@ -4,6 +4,8 @@
 
 (function() {
 
+    injectedScripts.push("filter-autoFilter.js");
+
     const tagsContainer = document.getElementById("multipletags");
     const otherContainer = document.querySelector('#showonly > .af-filters');
     const mylistContainer = document.querySelector('#userstatus > .af-filters');

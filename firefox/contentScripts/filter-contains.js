@@ -2,6 +2,8 @@
 
 (function() {
 
+    injectedScripts.push("filter-contains.js");
+
     const pillBottle = document.querySelector('.pillBottle');
 
 
