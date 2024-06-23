@@ -2,6 +2,8 @@
 # AnimePlanet Additions
 Adding new features / fixing minor inconveniences that i have found in animeplanet. 
 
+Gonna add chromium someday.
+
 ## Installation
 
 **Permissions:**
@@ -10,13 +12,6 @@ Adding new features / fixing minor inconveniences that i have found in animeplan
 
 ### Firefox
 Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https://github.com/Sandelier/AnimePlanet-Additions)
-
-### Chromium (Chrome, brave, etc)
-1. Download the zip file from [Releases](https://github.com/Sandelier/AnimePlanet-Additions/releases/latest).
-2. Manually add the zip file to your extension manager. You can typically find the extension manager in "browser://extensions/". You might need to enable developer mode to manually install zip files.
-
-(I would want to add it to Google's web store, but they want me to pay them for me to give them software I made for free for everyone to use so maybe some other day i might add it.)
-
 
 ### Options page
 You can disable/enable features in the options page of the addon. Options page in firefox is at about:addons and in chromium its browser://extensions.
