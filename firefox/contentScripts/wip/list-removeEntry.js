@@ -6,47 +6,6 @@
 
     injectedScripts.push("wip/list-removeEntry.js");
 
-	// Injecting the fetch interceptor to document.
-	var script = document.createElement('script');
-
-	script.textContent = `
-
-        // Made by AP-Additions extension.
-        // Used for list-removeEntry.js
-
-        const originalFetch = window.fetch;
-
-        window.fetch = async (...args) => {
-            try {
-                const response = await originalFetch(...args);
-            
-                if (args[0].startsWith('/api/custom_lists/applicable/manga/') && response.status === 200) {
-
-                    const clonedResponse = response.clone();
-                
-                    clonedResponse.text().then(body => {
-
-                        // Posting an message so content script can get the body.
-                        window.postMessage({
-                            action: "userCustomLists",
-                            body: body,
-                            userId: window.AP_VARS.USER_ID,
-                            token: TOKEN
-                        }, "*");
-                    
-                    }).catch(error => {
-                        console.error('Error reading response body:', error);
-                    });
-                }
-            
-                return response;
-            } catch (error) {
-                console.error('Fetch error:', error);
-                throw error;
-            }
-        };
-    `;
-
     const styleElement = document.createElement('style');
     
     styleElement.textContent = `
@@ -56,7 +15,6 @@
     `;
 
     document.head.appendChild(styleElement);
-	document.head.appendChild(script);
 
 
 	// Listening for the window to send the fetched data.

@@ -15,6 +15,8 @@ browser.runtime.onInstalled.addListener(() => {
             "other": ["Completed"],
             "mylist": ["Read", "Reading"]
         },
+
+        notes: [],
     
         contentScripts: {
             "helper-trackScripts.js": { 
@@ -33,6 +35,12 @@ browser.runtime.onInstalled.addListener(() => {
                 formattedName: "Easier filter tabs",
                 enabled: true,
                 description: "Helper script to add new filter methods.",
+                allowedUrls: []
+            },
+            "helper-interceptFetch.js": { 
+                formattedName: "Intercept fetch",
+                enabled: true,
+                description: "Intercepts fetch calls that animeplanet makes. Currently used for custom lists",
                 allowedUrls: []
             },
             "load-extrapages.js": {
@@ -91,6 +99,14 @@ browser.runtime.onInstalled.addListener(() => {
                 ],
                 wipText: "Currently the script can only handle lists that dont have extra pages."
             },
+            "list-multiselect.js": {
+                formattedName: "List multi select",
+                enabled: false,
+                description: 'Allows you to select multiple custom lists that you want to add the entry to',
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
+                ]
+            },
             "filter-autoFilter.js": { 
                 formattedName: "Auto filters",
                 enabled: false,
@@ -104,6 +120,14 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Adds an button to fetch mangaupdate's data and add it to the manga page.",
                 allowedUrls: [
                     "https://www.anime-planet.com/manga/"
+                ]
+            },
+            "add-EntryNotes.js": { 
+                formattedName: "Notes",
+                enabled: false,
+                description: "Allows you to add notes to any manga/anime",
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
                 ]
             }
         }
@@ -238,6 +262,14 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 sendResponse({ value });
             } else {
                 console.warn('Missing requestType for getLocalStorageValue');
+            }
+            break;
+        case 'setLocalStorageValue':
+            // We can add some error handling to this later like maybe sending an response back if it was successful or not so we can tell the user.
+            if (message.requestType && message.value) {
+                localStorage.setItem(message.requestType, JSON.stringify(message.value));
+            } else {
+                console.warn('Missing requestType for setLocalStorageValue');
             }
             break;
         case 'getMangaInfo':
