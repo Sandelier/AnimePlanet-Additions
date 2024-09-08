@@ -11,7 +11,7 @@ Gonna add chromium someday.
 - If you want to use the "Extra manga data" script then you need to also allow the extension to operate in mangaupdates api url.
 
 ### Firefox
-Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https://github.com/Sandelier/AnimePlanet-Additions)
+Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https://addons.mozilla.org/en-US/firefox/addon/animeplanet-additions/)
 
 ### Options page
 You can disable/enable features in the options page of the addon. Options page in firefox is at about:addons and in chromium its browser://extensions.
