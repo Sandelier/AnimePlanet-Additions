@@ -126,9 +126,13 @@ browser.runtime.onInstalled.addListener(() => {
                 formattedName: "Notes",
                 enabled: false,
                 description: "Allows you to add notes to any manga/anime",
-                allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
-                ]
+                allowedUrls: []
+            },
+            "wip/customTags.js": { 
+                formattedName: "Custom tags",
+                enabled: false,
+                description: "Allows creating and adding of custom tags to entries",
+                allowedUrls: []
             }
         }
     };
@@ -204,6 +208,7 @@ async function executeContentScript(url, tabId) {
 
             const script = contentScripts[scriptName];
 
+
             if (!tabInjectedScripts.has(scriptName) && script.enabled) {
 
                 // url check 
@@ -215,16 +220,19 @@ async function executeContentScript(url, tabId) {
                 }
 
                 // script injection
-
-                await browser.scripting.executeScript({
-                    target: {
-                        tabId: tabId,
-                        allFrames: true,
-                    },
-                    files: [`contentScripts/${scriptName}`],
-                });
-                console.log(`Injected script: ${scriptName}`);
-                tabInjectedScripts.add(scriptName); 
+                try {
+                    await browser.scripting.executeScript({
+                        target: {
+                            tabId: tabId,
+                            allFrames: true,
+                        },
+                        files: [`contentScripts/${scriptName}`],
+                    });
+                    console.log(`Injected script: ${scriptName}`);
+                    tabInjectedScripts.add(scriptName); 
+                } catch (error) {
+                    console.error("Failed to inject content script:", error);
+                }
             }
         }
 
