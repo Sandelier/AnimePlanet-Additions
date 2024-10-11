@@ -30,13 +30,38 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
   <summary><h2>Current Features</h2></summary>
 
   <details>
-    <summary>Extra pages</summary>
-    Allows you to load more mangas/animes into one page by loading extra pages.
+    <summary>List entry remover</summary>
+    Makes it that you can click the list to remove the entry from custom list in "Add to new custom list"
+  </details>
+
+  <details>
+    <summary>Notes</summary>
+    Allows you to add notes to any manga/anime
+  </details>
+
+  <details>
+    <summary>Custom tags</summary>
+    Allows creating and adding of custom tags to entries
   </details>
 
   <details>
     <summary>Apply button shown</summary>
     Makes the apply button on filters to be always shown.
+  </details>
+
+  <details>
+    <summary>Auto filters</summary>
+    Automatically adds filters
+  </details>
+  
+  <details>
+    <summary>Chapter filtering</summary>
+    Adds chapter filtering in current page.
+  </details>
+
+  <details>
+    <summary>Contains filtering</summary>
+    Filters entries that dont contain any of the tags defined.
   </details>
 
   <details>
@@ -55,28 +80,23 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
   </details>
 
   <details>
-    <summary>Chapter filtering</summary>
-    Adds chapter filtering in current page.
-  </details>
-
-  <details>
-    <summary>Contains filtering</summary>
-    Filters entries that dont contain any of the tags defined.
-  </details>
-
-  <details>
-    <summary>List entry remover</summary>
-    Makes it that you can click the list to remove the entry from custom list in "Add to new custom list"
-  </details>
-
-  <details>
-    <summary>Auto filters</summary>
-    Automatically adds filters
-  </details>
-
-  <details>
     <summary>Extra manga data</summary>
     Adds an button to fetch mangaupdate's data and add it to the manga page. In example description or alternative titles since animeplanet usually doesn't say the raw name
+  </details>
+
+  <details>
+    <summary>List multiselect</summary>
+    Allows you to select multiple custom lists that you want to add the entry to
+  </details>
+
+  <details>
+    <summary>Extra pages</summary>
+    Allows you to load more mangas/animes into one page by loading extra pages.
+  </details>
+
+  <details>
+    <summary>Still left</summary>
+    Shows episodes or chapters still left on entry.
   </details>
 
 </details>

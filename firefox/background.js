@@ -102,7 +102,7 @@ browser.runtime.onInstalled.addListener(() => {
                 wipText: "Currently the script can only handle lists that dont have extra pages."
             },
             "list-multiselect.js": {
-                formattedName: "List multi select",
+                formattedName: "List multiselect",
                 enabled: false,
                 description: 'Allows you to select multiple custom lists that you want to add the entry to',
                 allowedUrls: [
