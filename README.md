@@ -15,7 +15,6 @@ Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https:/
 
 ### Options page
 You can disable/enable features in the options page of the addon. Options page in firefox is at about:addons and in chromium its browser://extensions.
-Options page is gonna be redesigned sooner or later.
 
 ### Acknowledgements
 * **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used for "Extra manga data" feature to fetch manga data
