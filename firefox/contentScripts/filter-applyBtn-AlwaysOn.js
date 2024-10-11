@@ -11,9 +11,8 @@
     
     styleElement.textContent = `
         .applyBtn-AlwaysOn {
-            display: flex !important;
+            display: block !important;
             height: auto !important;
-            padding: 0.5em 1em !important;
         }
     `;
     

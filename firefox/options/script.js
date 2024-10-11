@@ -1,8 +1,5 @@
 
 
-
-// Made the whole options page very hastly so gonna basically remake it someday.
-
 function createSwitchElement(enabled, scriptName) {
     const label = document.createElement("label");
     label.classList.add("switch");
@@ -197,3 +194,83 @@ document.getElementById('overlay-close').addEventListener("click", function() {
         }
     }
 });
+
+
+
+
+
+
+
+
+
+
+// -------------------------------------------------------------------------
+
+// export
+
+document.getElementById('exportBtn').addEventListener("click", function() {
+    exportSettings();
+});
+
+function exportSettings() {
+
+
+    const blob = new Blob([JSON.stringify(localStorageData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.download = 'animeplanet-additions-export.json';
+    link.href = url;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// import
+
+document.getElementById('importBtn').addEventListener("click", function() {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener("change", function(event) {
+    const file = event.target.files[0]; 
+
+    if (file && file.type === "application/json") {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const content = e.target.result;
+            try {
+                importSettings(JSON.parse(content));
+            } catch (err) {
+                console.error("Error parsing JSON:", err);
+            }
+        };
+
+        reader.readAsText(file);
+    } else {
+        console.error("Please select a valid JSON file.");
+        alert("Please select a valid JSON file.");
+    }
+});
+
+function importSettings(content) {
+    try {
+        for (let key in content) {
+            if (content.hasOwnProperty(key)) {
+                if (localStorageData.hasOwnProperty(key)) {
+                    localStorageData[key] = content[key];
+                    localStorage.setItem(key, JSON.stringify(content[key]));
+                }
+            }
+        }
+
+        console.log("Settings imported successfully", localStorageData);
+        alert("Settings imported successfully");
+    } catch (err) {
+        console.log("Encountered an error while trying to import settings", err);
+        alert("Encountered an error while trying to import settings");
+    }
+}

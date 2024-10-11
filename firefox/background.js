@@ -6,6 +6,8 @@ browser.runtime.onInstalled.addListener(() => {
     const defaultSettings = {
         pagesToSearch: 1,
 
+        customTags: [],
+
         autoFilters: {
             "tags": {
               "Sexual Content": "-",
@@ -126,8 +128,20 @@ browser.runtime.onInstalled.addListener(() => {
                 formattedName: "Notes",
                 enabled: false,
                 description: "Allows you to add notes to any manga/anime",
+                allowedUrls: []
+            },
+            "customTags.js": { 
+                formattedName: "Custom tags",
+                enabled: false,
+                description: "Allows creating and adding of custom tags to entries",
+                allowedUrls: []
+            },
+            "stillLeft.js": { 
+                formattedName: "Still left",
+                enabled: false,
+                description: "Shows episodes or chapters still left on entry.",
                 allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
+                    "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)\/(?:dropped|reading|watching|stalled)"
                 ]
             }
         }
@@ -192,9 +206,7 @@ async function executeContentScript(url, tabId) {
 
         const isFilterAllowed = isScriptTypeAllowed(url, filterScriptsAllowedUrls);
 
-
         for (const scriptName in contentScripts) {
-
 
             if (scriptName.startsWith('filter-')) {
                 if (!isFilterAllowed) {
@@ -203,6 +215,7 @@ async function executeContentScript(url, tabId) {
             }
 
             const script = contentScripts[scriptName];
+
 
             if (!tabInjectedScripts.has(scriptName) && script.enabled) {
 
@@ -215,16 +228,19 @@ async function executeContentScript(url, tabId) {
                 }
 
                 // script injection
-
-                await browser.scripting.executeScript({
-                    target: {
-                        tabId: tabId,
-                        allFrames: true,
-                    },
-                    files: [`contentScripts/${scriptName}`],
-                });
-                console.log(`Injected script: ${scriptName}`);
-                tabInjectedScripts.add(scriptName); 
+                try {
+                    await browser.scripting.executeScript({
+                        target: {
+                            tabId: tabId,
+                            allFrames: true,
+                        },
+                        files: [`contentScripts/${scriptName}`],
+                    });
+                    console.log(`Injected script: ${scriptName}`);
+                    tabInjectedScripts.add(scriptName); 
+                } catch (error) {
+                    console.error("Failed to inject content script:", error);
+                }
             }
         }
 

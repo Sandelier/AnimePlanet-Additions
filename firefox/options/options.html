@@ -4,35 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AP-Additions - Options</title>
+    <script src="stylingScript.js" defer></script>
     <script src="script.js" defer></script>
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/scriptsPage.css">
     <link rel="stylesheet" href="styles/overlay.css">
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <header>
-        <div class="text-container">
-            <button>Scripts</button>
-        </div>
-        <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank">
-            <img src="images/github.webp" id="header-image">
-        </a>
-    </header>
+    <div id="mainContent">
+        <div id="homePage">
+            
+            <h1>Animeplanet Additions</h1>
+            <p>Extension to add features and fixing inconveniences i have had with animeplanet.</p>
+            <div>
+                <button id="importBtn">Import</button>
+                <button id="exportBtn">Export</button>
+                <input type="file" id="fileInput" accept=".json" style="display:none"/>
 
-    <div id="scriptsPage-container">
-
-        <div id="button-sidebar">
-            <button class="btn-active">All</button>
-            <button>Filters</button>
-            <button>Forums</button>
-            <button>Other</button>
-            <button>Helpers</button>
+                <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank" id="githubBtn">Github</a>
+            </div>
         </div>
 
-        <div id="scripts-container"></div>
+        <div id="scriptsPage">
+
+            <div id="button-sidebar">
+                <button class="btn-active">All</button>
+                <button>Filters</button>
+                <button>Forums</button>
+                <button>Other</button>
+                <button>Helpers</button>
+            </div>
+
+            <div id="scripts-container"></div>
+        </div>
     </div>
-
-
+    
     <div id="overlay">
         <div id="overlay-container">
             <div id="overlay-header">

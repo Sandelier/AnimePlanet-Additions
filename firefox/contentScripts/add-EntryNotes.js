@@ -15,6 +15,14 @@
             padding: 0.5em;
             resize: none;
         }
+        .noteIcon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 1.8em !important;
+            color: yellow;
+            text-shadow: 0px 0px 7px black;
+        }
     `;
 
     document.head.appendChild(styleElement);
@@ -103,10 +111,44 @@ function getEntryInfo() {
 
 browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'notes' }).then((response) => {
     if (response && response.value) {
-        addNote(JSON.parse(response.value));
+
+        const currentUrl = window.location.href;
+        const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$/;
+        if (urlRegex.test(currentUrl)) {
+            addNote(JSON.parse(response.value));
+        }
+
+
+
+        tooltipData.forEach(item => {
+            
+            const type = item.tooltip.parentElement.getAttribute('data-type');
+            const id = item.tooltip.parentElement.getAttribute('data-id');
+
+            const tooltipImage = item.tooltip.querySelector("div.crop");
+
+            addNoteIcon(tooltipImage, type, id, JSON.parse(response.value));
+        });
+
     } else {
         console.log('Failed to retrieve notes data');
     }
 }).catch(error => {
     console.error('Error retrieving notes data:', error);
 });
+
+
+
+// Just add an mail icon to the bottom right corner of an tooltip if you have note in it
+function addNoteIcon(cropDiv, type, id, notesArray) {
+    const noteExists = notesArray.some(note => note.type === type && note.id == id);
+
+    if (noteExists) {
+        const noteIcon = document.createElement("p");
+        noteIcon.textContent = "✉";
+
+        noteIcon.classList.add('noteIcon');
+        
+        cropDiv.appendChild(noteIcon);    
+    }
+}

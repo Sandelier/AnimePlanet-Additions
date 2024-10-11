@@ -20,9 +20,6 @@
         const filterField = document.querySelector(".pillLabel");
         filterField.appendChild(quickApplyBtn);
     
-        filterField.style.display = 'flex';
-        filterField.style.flexDirection = 'column';
-    
         quickApplyBtn.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();

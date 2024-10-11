@@ -2,7 +2,7 @@
 
 // https://www.anime-planet.com/forum/threads/multiselect-for-assigning-custom-lists.351332/
 
-injectedScripts.push("wip/list-removeEntry.js");
+injectedScripts.push("list-multiselect.js");
 
 window.addEventListener("message", (event) => {
     if (event.source == window && event.data && event.data.action == "userCustomLists") {
