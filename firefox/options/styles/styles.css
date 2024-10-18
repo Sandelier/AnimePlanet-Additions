@@ -29,14 +29,34 @@ body {
     text-align: center;
 }
 
+#homePage > div,
+#visualizerMain > div {
+  user-select: none;
+}
+
 @font-face {
     font-family: 'Allan';
-    src: url('../Allan-Bold.ttf') format('truetype');
+    src: url('../fonts/Allan/Allan-Bold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
   }
 
-#homePage > h1 {
+  @font-face {
+    font-family: 'Mulish';
+    src: url('../fonts/Mulish/Mulish-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Oswald';
+    src: url('../fonts/Oswald/Oswald-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+#homePage > h1,
+#visualizerMain > h1 {
     font-size: 4rem;
     font-family: "Allan", cursive;
     font-weight: 400;
@@ -46,7 +66,9 @@ body {
     margin: 0;
 }
 
-#homePage > p {
+#homePage > p,
+#visualizerMain > p,
+#visualizerStart > p {
     padding: 0;
     margin: 0;
     margin-bottom: 24px;
@@ -57,9 +79,7 @@ body {
     font-family: "Roboto", sans-serif;
 }
 
-#importBtn,
-#exportBtn,
-#githubBtn {
+.defaultBtnStyle {
     border: none;
     font-size: 16px;
     font-weight: 600;
@@ -74,11 +94,10 @@ body {
     user-select: none;
     display: inline-block;
     text-decoration: none;
+    font-family: sans-serif;
 }
 
-#importBtn:hover,
-#exportBtn:hover,
-#githubBtn:hover {
+.defaultBtnStyle:hover {
     transform: scale(1.1);
 }
 
@@ -298,4 +317,122 @@ input:checked + .slider:before {
 
 .card-wip:hover .card-wip-tooltip{
   visibility: visible
+}
+
+
+/* Visualizer page */
+
+#visualizerPage {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+#visualizerMain {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(to top, #ffd8b1, #4bffc4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.deactivatedBtn {
+  cursor: not-allowed;
+  background-color: #a2a2a2;
+}
+
+#visualizerStart {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  right: -100%;
+  top: 0;
+  background: linear-gradient(to top, #ffd8b1, #4bffc4);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+#visualizerStart > div {
+  width: 100%;
+
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  margin-bottom: 24px;
+}
+
+#visualizerStart > div > div > button {
+  margin: 0px 0px 0px 16px;
+}
+
+#visualizerStart-usernameField {
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  padding: 8px 16px;
+  background: rgb(35, 38, 59);
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  transition: transform 0.25s;
+  font-family: sans-serif;
+  border-radius: 7px;
+}
+
+.dataTypeSelected {
+  transform: scale(1.1);
+  color: #ffce90;
+}
+
+
+#visualizerStats {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to top, #ff8686, #ffd8b1);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: stretch;
+  justify-content: flex-end;
+  padding: 50px;
+}
+
+
+#visualizerStats-header {
+  flex: 1;
+  align-content: center;
+}
+
+#visualizerStats-header > h1 {
+  font-size: 4rem;
+  font-family: "Allan", cursive;
+  font-weight: 400;
+  color: rgb(57, 57, 57);
+  text-shadow: rgba(13, 0, 77, 0.08) 0px 2px 4px, rgba(13, 0, 77, 0.08) 0px 3px 6px, rgba(13, 0, 77, 0.08) 0px 8px 16px;
+  padding: 0;
+  margin: 0;
+}
+
+#visualizerStats-header > p {
+  padding: 0;
+  margin: 0;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 18px;
+  color: rgb(60, 58, 70);
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
 }

@@ -47,20 +47,21 @@
     }
 
 
-    browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'autoFilters' }).then((response) => {
-        if (response && response.value) {
+    (async () => {
+        try {
+            const response = await requestFromLocal('getLocalStorageValue', 'autoFilters');
+            if (response && response.value) {
+                const autoFilters = JSON.parse(response.value);
 
-            const autoFilters = JSON.parse(response.value);
-
-            applyOthers(otherContainer, autoFilters["other"]);
-            applyOthers(mylistContainer, autoFilters["mylist"]);
-            applyTags(autoFilters["tags"]);
-
-        } else {
-            console.log('Failed to retrieve disallowed tags');
+                applyOthers(otherContainer, autoFilters["other"]);
+                applyOthers(mylistContainer, autoFilters["mylist"]);
+                applyTags(autoFilters["tags"]);
+            } else {
+                console.log('Failed to retrieve autofilters');
+            }
+        } catch (error) {
+            console.error('Error fetching autofilters:', error);
         }
-    }).catch(error => {
-        console.error('Error fetching disallowed tags:', error);
-    });
+    })();
 
 })();

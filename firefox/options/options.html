@@ -6,6 +6,11 @@
     <title>AP-Additions - Options</title>
     <script src="stylingScript.js" defer></script>
     <script src="script.js" defer></script>
+    <script src="visualizer/visualizer-main.js" defer></script>
+    <script src="visualizer/visualizer-stats.js" defer></script>
+
+    <script src="visualizer/chart.js"></script>
+
     <link rel="stylesheet" href="styles/overlay.css">
     <link rel="stylesheet" href="styles/styles.css">
 </head>
@@ -16,11 +21,14 @@
             <h1>Animeplanet Additions</h1>
             <p>Extension to add features and fixing inconveniences i have had with animeplanet.</p>
             <div>
-                <button id="importBtn">Import</button>
-                <button id="exportBtn">Export</button>
+                <button id="importBtn" class="defaultBtnStyle">Import</button>
+                <button id="exportBtn" class="defaultBtnStyle">Export</button>
                 <input type="file" id="fileInput" accept=".json" style="display:none"/>
 
-                <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank" id="githubBtn">Github</a>
+                <button id="featuresBtn" class="defaultBtnStyle">Features</button>
+                <button id="visualizerBtn" class="defaultBtnStyle">Visualizer</button>
+
+                <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank" id="githubBtn" class="defaultBtnStyle">Github</a>
             </div>
         </div>
 
@@ -35,6 +43,45 @@
             </div>
 
             <div id="scripts-container"></div>
+        </div>
+
+        <div id="visualizerPage">
+            <div id="visualizerMain">
+                <h1>AP Visualizer</h1>
+                <p>Scrapes an list and visualizes the data from it</p>
+                <div>
+                    <button id="visualizer-startBtn" class="defaultBtnStyle">Start</button>
+
+                    <button id="visualizer-animeStatsBtn" class="defaultBtnStyle deactivatedBtn">Anime</button>
+                    <button id="visualizer-mangaStatsBtn" class="defaultBtnStyle deactivatedBtn">Manga</button>
+
+                </div>
+            </div>
+
+            <div id="visualizerStart">
+
+                <p>Provide username and select data type to start scraping data from their list</p>
+                <div>
+                    <input id="visualizerStart-usernameField" placeholder="Username" type="text">
+
+                    <div>
+                        <button id="mangaType" class="defaultBtnStyle dataTypeSelected">Manga</button>
+                        <button id="animeType" class="defaultBtnStyle">Anime</button>
+                    </div>
+                </div>
+                <button id="scrapeBtn" class="defaultBtnStyle">Start scraping</button>
+            </div>
+        </div>
+
+        <div id="visualizerStats">
+
+            <div id="visualizerStats-header">
+                <h1>Sandelier's manga list</h1>
+                <p></p>
+                <button id="exportJsonDataBtn" class="defaultBtnStyle">Export json</button>
+            </div>
+            <div id="visualizerStats-topBottom" style="display: flex; justify-content: space-evenly; align-items: center;"></div>
+            <div id="visualizerStats-bottom"></div>
         </div>
     </div>
     

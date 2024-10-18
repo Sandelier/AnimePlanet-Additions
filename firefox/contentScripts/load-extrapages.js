@@ -160,14 +160,19 @@
     }
 
 
-    browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'pagesToSearch' }).then((response) => {
-        if (response && response.value) {
-            main(JSON.parse(response.value));
-        } else {
-            console.log('Failed to retrieve disallowed tags');
+    (async () => {
+        try {
+            const response = await requestFromLocal('getLocalStorageValue', 'pagesToSearch');
+            if (response && response.value) {
+                main(JSON.parse(response.value));
+            } else {
+                console.log('Failed to retrieve pagesToSearch');
+            }
+        } catch (error) {
+            console.error('Error fetching pagesToSearch:', error);
         }
-    }).catch(error => {
-        console.error('Error fetching disallowed tags:', error);
-    });
+    })();
+
+    
 
 })();

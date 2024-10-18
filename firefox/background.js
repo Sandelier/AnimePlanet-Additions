@@ -27,6 +27,12 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Helper script to keep track of current scripts in the page.",
                 allowedUrls: []
             },
+            "helper-browserSpecifics.js": { 
+                formattedName: "Browser specifics",
+                enabled: true,
+                description: "Helper script to make content scripts work for chromium and firefox.",
+                allowedUrls: []
+            },
             "helper-parseTooltips.js": { 
                 formattedName: "Tooltip parse",
                 enabled: true,
@@ -157,8 +163,12 @@ browser.runtime.onInstalled.addListener(() => {
     
     
     Object.keys(defaultSettings).forEach(key => {
-        if (!localStorage.getItem(key)) {
+        let storedValue = JSON.parse(localStorage.getItem(key));
+        if (!storedValue) {
             localStorage.setItem(key, JSON.stringify(defaultSettings[key]));
+        } else if (key === 'contentScripts') {
+            const mergedScripts = { ...defaultSettings.contentScripts, ...storedValue };
+            localStorage.setItem(key, JSON.stringify(mergedScripts));
         }
     });
 
@@ -268,6 +278,9 @@ function isScriptTypeAllowed(url, allowedArray) {
     return false;
 }
 
+let moduleLoaded = false;
+let pageOpenedId;
+
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
@@ -289,10 +302,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
             break;
         case 'getMangaInfo':
-            if (message.mangaName) {
+            if (message.value) {
                 (async () => {
                     try {
-                        const mangaInfo = await getMangaInfo(message.mangaName);
+                        const mangaInfo = await getMangaInfo(message.value);
                         sendResponse({ mangaInfo });
                     } catch (error) {
                         console.error('Error fetching manga info:', error);
@@ -303,6 +316,34 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 console.warn('Missing manga name for getMangaInfo');
             }
 
+        case 'scrapeUser':
+
+            if (!moduleLoaded) {
+                import('./moduleScripts/StatsScraper/background.js')
+                    .then((module) => {
+                        moduleLoaded = true;
+                        browser.windows.create({
+                            url: `https://www.anime-planet.com/users/${message.value.username}/${message.value.dataType}?per_page=560`,
+                            type: "detached_panel",
+                            width: 800,
+                            height: 600
+                        })
+                        .then((window) => {
+                            pageOpenedId = window.id;
+                        })
+                        .catch((error) => {
+                            console.error(`Error creating window: ${error}`);
+                        });
+                    })
+                    .catch((error) => console.error("Error loading extra script:", error));
+            }
+
+        case 'stop':
+            if (pageOpenedId) {
+                browser.windows.remove(pageOpenedId)
+                pageOpenedId = "";
+            }
+
         default:
             console.warn('Unknown action:', message.action);
             break;
@@ -310,6 +351,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return true;
 });
+
 
 
 function checkTabUrl(url, tabId) {

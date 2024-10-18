@@ -181,19 +181,19 @@ function handleCustomTagInLocal(tag, action, state) {
         }
     }
 
-    const message = {
-        action: "setLocalStorageValue",
-        requestType: 'customTags',
-        value: customTags
-    };
+    (async () => {
+        try {
+            const response = await requestFromLocal('setLocalStorageValue', 'customTags', customTags);
+            if (response && response.value) {
+                console.log("Local storage updated successfully.");
 
-    browser.runtime.sendMessage(message)
-        .then(response => {
-            console.log("Local storage updated successfully.");
-        })
-        .catch(error => {
+            } else {
+                console.log('ailed to update local storage');
+            }
+        } catch (error) {
             console.error("Error occurred while updating local storage:", error);
-        });
+        }
+    })();
 }
 
 

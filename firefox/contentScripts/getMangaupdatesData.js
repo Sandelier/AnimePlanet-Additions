@@ -10,14 +10,20 @@
 		const mangaName = mangaNameElement.textContent.trim();
 
 		function getMangaInfo(name) {
-			browser.runtime.sendMessage({
-				action: 'getMangaInfo',
-				mangaName: name
-			}).then((response) => {
-				handleResponse(response);
-			}).catch(error => {
-				console.error('Error fetching manga info:', error);
-			});
+			(async () => {
+				try {
+					const response = await requestFromLocal('getMangaInfo', '', name);
+					if (response && response.value) {
+						handleResponse(response);
+					} else {
+						console.log('Failed to retrieve manga info');
+					}
+				} catch (error) {
+					console.error('Error fetching manga info:', error);
+				}
+			})();
+
+			
 		}
 
 		function handleResponse(response) {

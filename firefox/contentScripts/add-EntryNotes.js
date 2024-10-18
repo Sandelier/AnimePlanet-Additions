@@ -57,19 +57,19 @@ function addNote(notesArray) {
 
         noteObject.note = noteTextarea.value;
 
-        const message = {
-            action: "setLocalStorageValue",
-            requestType: 'notes',
-            value: notesArray
-        }
+        (async () => {
+            try {
+                const response = await requestFromLocal('setLocalStorageValue', 'notes', notesArray);
+                if (response && response.value) {
+                    console.log("Local storage updated successfully.");
 
-        browser.runtime.sendMessage(message)
-            .then(response => {
-                console.log("Note saved:", notesArray);
-            })
-            .catch(error => {
-                console.error("Error occured while updating notes:", error);
-            })
+                } else {
+                    console.log('ailed to update local storage');
+                }
+            } catch (error) {
+                console.error("Error occurred while updating local storage:", error);
+            }
+        })();
     });
 }
 
@@ -108,34 +108,34 @@ function getEntryInfo() {
     return { id: parseInt(dataId), type: dataMode};
 }
 
+(async () => {
+    try {
+        const response = await requestFromLocal('getLocalStorageValue', 'notes');
+        if (response && response.value) {
+            const currentUrl = window.location.href;
+            const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$/;
+            if (urlRegex.test(currentUrl)) {
+                addNote(JSON.parse(response.value));
+            }
 
-browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'notes' }).then((response) => {
-    if (response && response.value) {
 
-        const currentUrl = window.location.href;
-        const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$/;
-        if (urlRegex.test(currentUrl)) {
-            addNote(JSON.parse(response.value));
+
+            tooltipData.forEach(item => {
+
+                const type = item.tooltip.parentElement.getAttribute('data-type');
+                const id = item.tooltip.parentElement.getAttribute('data-id');
+
+                const tooltipImage = item.tooltip.querySelector("div.crop");
+
+                addNoteIcon(tooltipImage, type, id, JSON.parse(response.value));
+            });
+        } else {
+            console.log('Failed to retrieve notes data');
         }
-
-
-
-        tooltipData.forEach(item => {
-            
-            const type = item.tooltip.parentElement.getAttribute('data-type');
-            const id = item.tooltip.parentElement.getAttribute('data-id');
-
-            const tooltipImage = item.tooltip.querySelector("div.crop");
-
-            addNoteIcon(tooltipImage, type, id, JSON.parse(response.value));
-        });
-
-    } else {
-        console.log('Failed to retrieve notes data');
+    } catch (error) {
+        console.error('Error retrieving notes data:', error);
     }
-}).catch(error => {
-    console.error('Error retrieving notes data:', error);
-});
+})();
 
 
 
