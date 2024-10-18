@@ -6,7 +6,7 @@ browser.runtime.onInstalled.addListener(() => {
     const defaultSettings = {
         pagesToSearch: 1,
 
-        customTags: [],
+        customTags: {},
 
         autoFilters: {
             "tags": {
@@ -189,6 +189,7 @@ const filterScriptsAllowedUrls = [
 const injectedScripts = new Map();
 
 async function executeContentScript(url, tabId) {
+
     try {
 
 

@@ -140,24 +140,26 @@ function createCustomTag() {
 function handleCustomTagInLocal(tag, action, state) {
     const { id, type } = getEntryInfo();
 
-    const existingTagIndex = customTags.findIndex(tagObj => 
-        tagObj.tag === tag && tagObj.id === id && tagObj.type === type
-    );
-
     if (action === 'save') {
-        if (existingTagIndex !== -1) {
-            customTags[existingTagIndex].state = state;
+        if (customTags[tag] && customTags[tag][id]) {
+
+            // its night so imma work on this later
+
+            if (state === false) {
+                delete customTags[tag][id];
+            } else {
+                customTags[tag][id].state = state;
+            }
+
         } else {
             let name = document.querySelector('h1.long')?.textContent;
             if (!name) {
                 name = document.querySelector('h1[itemprop="name"]').textContent;
             }
-
+        
             const imageUrl = document.querySelector('div.mainEntry > img.screenshots').src;
-
-            const customTagObj = {
-                tag: tag,
-                id: id,
+        
+            const newEntry = {
                 type: type,
                 state: state,
                 entryInfo: {
@@ -166,18 +168,19 @@ function handleCustomTagInLocal(tag, action, state) {
                     imageUrl: imageUrl
                 }
             };
-            customTags.push(customTagObj);
+        
+            if (!customTags[tag]) {
+                customTags[tag] = {};
+            }
+        
+            customTags[tag][id] = newEntry;
         }
 
         console.log("Tag saved or updated:", customTags);
 
     } else if (action === 'remove') {
-        if (existingTagIndex !== -1) {
-            customTags.splice(existingTagIndex, 1);
-            console.log("Tag removed:", customTags);
-        } else {
-            console.log("Tag not found.");
-            return;
+        if (customTags[tag]) {
+            delete customTags[tag];
         }
     }
 
@@ -324,13 +327,12 @@ function handleTagAction(tag, tagsSection) {
     }
 }
 
-let customTags = [];
+let customTags = {};
 
 browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'customTags' }).then((response) => {
     if (response && response.value) {
 
         customTags = JSON.parse(response.value);
-        console.log(customTags);
 
         // Adding custom tags to the custom tag section
         const currentUrl = window.location.href;
@@ -338,46 +340,69 @@ browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'cust
         const tagsContainer = document.querySelector('.customTagsContainer .tagsList');
 
         if (urlRegex.test(currentUrl)) {
-            customTags.forEach(tagObj => {
-                const tag = document.createElement('li');
-                const tagsSection = document.querySelector("#entry > div > div > div > div.tags > ul");
-
-                tag.addEventListener("click", function() {
-                    handleTagAction(tag, tagsSection);
+            Object.keys(customTags).forEach(tagName => {
+                let tagCreated = false;
+        
+                Object.keys(customTags[tagName]).forEach(entryId => {
+                    let entryData = customTags[tagName][entryId];
+                    const { id, type } = getEntryInfo();
+        
+                    if (entryData.state === true && entryId == id && entryData.type == type) {
+                        if (!tagCreated) {
+                            const tag = document.createElement('li');
+                            const tagsSection = document.querySelector("#entry > div > div > div > div.tags > ul");
+        
+                            tag.textContent = tagName;
+                            tag.addEventListener("click", function() {
+                                handleTagAction(tag, tagsSection);
+                            });
+        
+                            tag.classList.add('customTagSelected');
+                            addCustomTagToEntry(tag, tagsSection);
+                            tagsContainer.appendChild(tag);
+        
+                            tagCreated = true;
+                        }
+                        return;
+                    }
                 });
-
-                tag.textContent = tagObj.tag;
-                const { id, type } = getEntryInfo();
-                if (tagObj.state === true && tagObj.id == id && tagObj.type == type) {
-                    tag.classList.add('customTagSelected');
-                    addCustomTagToEntry(tag, tagsSection);
+        
+                if (!tagCreated) {
+                    const tag = document.createElement('li');
+                    const tagsSection = document.querySelector("#entry > div > div > div > div.tags > ul");
+        
+                    tag.textContent = tagName;
+                    tag.addEventListener("click", function() {
+                        handleTagAction(tag, tagsSection);
+                    });
+        
+                    tagsContainer.appendChild(tag);
                 }
-
-                tagsContainer.appendChild(tag);
-
             });
         }
-
+        
         // Adds custom tags to tooltips
         if (tooltipData.length > 0) {
-
             tooltipData.forEach(data => {
                 const tooltipCard = data.tooltip.parentElement;
                 const id = tooltipCard.getAttribute('data-id');
                 const type = tooltipCard.getAttribute('data-type');
                 const parsedTitleTags = data.parsedTitle.querySelector('.tags ul');
-                
-                customTags.forEach(tag => {
-                    if (tag.id == id && tag.type == type && tag.state === true) {
-                        const li = document.createElement('li');
-                        li.textContent = tag.tag;
-                        li.classList.add('customTagInEntry');
-
-                        parsedTitleTags.appendChild(li);
-                    }
+        
+                Object.keys(customTags).forEach(tagName => {
+                    Object.keys(customTags[tagName]).forEach(entryId => {
+                        let entryData = customTags[tagName][entryId];
+                        if (entryId == id && entryData.type == type && entryData.state === true) {
+                            const li = document.createElement('li');
+                            li.textContent = tagName;
+                            li.classList.add('customTagInEntry');
+        
+                            parsedTitleTags.appendChild(li);
+                        }
+                    });
                 });
-
-                data.tooltip.setAttribute('title', data.parsedTitle.innerHTML);;
+        
+                data.tooltip.setAttribute('title', data.parsedTitle.innerHTML);
             });
         }
 
@@ -385,7 +410,7 @@ browser.runtime.sendMessage({ action: 'getLocalStorageValue', requestType: 'cust
         console.log('Failed to retrieve custom tags data');
     }
 
-    const regex = /^https:\/\/www\.anime\-planet\.com\/users\/[^\/]+\/(manga|anime)(\/.*)?$/;
+    const regex = /^https:\/\/www\.anime\-planet\.com\/users\/[^\/]+\/(manga|anime)(\/.*)?(\?.*)?$/;
     if (regex.test(currentUrl)) {
         addCustomTagsFilter()
     }
@@ -431,49 +456,53 @@ function addCustomTagsFilter() {
     const addedTags = new Set();
 
 
-    const regex = /https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/([^\/]+)(?:\/|$)/;
+    const regex = /https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/([^\/]+)(?:\/|\?|$)/;
     const match = currentUrl.match(regex);
     let type;
     if (match) {
-        type = match[1];
+        type = match[1].split('?')[0];
     }
 
-    customTags.forEach(tag => {
-        if (!addedTags.has(tag.tag) && tag.state === true && type === tag.type) {
-            const tagTooltip = document.createElement('li');
-            tagTooltip.classList.add('filter', 'ternary', 'n');
-            tagTooltip.style.userSelect = "none";
+    Object.keys(customTags).forEach(tagName => {
+        const tagEntries = customTags[tagName];
     
-            const tagEle = document.createElement('a');
-            const tagCount = customTags.filter(t => t.tag === tag.tag && t.type === tag.type && t.state === true).length;
-            tagEle.textContent = `${tag.tag} (${tagCount})`;
+        Object.keys(tagEntries).forEach(entryId => {
+            const tag = tagEntries[entryId];
     
-            tagTooltip.appendChild(tagEle);
+            if (!addedTags.has(tagName) && tag.state === true && type === tag.type) {
+                const tagTooltip = document.createElement('li');
+                tagTooltip.classList.add('filter', 'ternary', 'n');
+                tagTooltip.style.userSelect = "none";
     
-            tagList.appendChild(tagTooltip);
+                const tagEle = document.createElement('a');
+                const tagCount = Object.values(customTags[tagName]).filter(t => t.type === tag.type && t.state === true).length;
+                tagEle.textContent = `${tagName} (${tagCount})`;
     
-            addedTags.add(tag.tag);
+                tagTooltip.appendChild(tagEle);
+                tagList.appendChild(tagTooltip);
+                addedTags.add(tagName);
     
-            tagEle.addEventListener('click', () => {
-                if (tagTooltip.classList.contains('tag-tooltip-active')) {
-                    tagTooltip.classList.remove('tag-tooltip-active');
-                    hideCustomTagEntries();
-                } else {
-                    document.querySelectorAll('.tag-tooltip-active').forEach(item => {
-                        item.classList.remove('tag-tooltip-active');
-                    });
+                tagEle.addEventListener('click', () => {
+                    if (tagTooltip.classList.contains('tag-tooltip-active')) {
+                        tagTooltip.classList.remove('tag-tooltip-active');
+                        hideCustomTagEntries();
+                    } else {
+                        document.querySelectorAll('.tag-tooltip-active').forEach(item => {
+                            item.classList.remove('tag-tooltip-active');
+                        });
     
-                    tagTooltip.classList.add('tag-tooltip-active');
+                        tagTooltip.classList.add('tag-tooltip-active');
     
-                    showCustomTagEntries(tag.tag, type);
-                }
-            });
-        }
+                        showCustomTagEntries(tagName, type);
+                    }
+                });
+            }
+        });
     });
 }
 
 
-function showCustomTagEntries(customTag, type) {
+function showCustomTagEntries(tagName, type) {
 
     
     const cardDeckElement = document.querySelector('ul.cardDeck');
@@ -481,39 +510,43 @@ function showCustomTagEntries(customTag, type) {
     let hasNewCards = false;
     const processedTags = new Set();
 
-    customTags.forEach(tag => {
-        if (tag.type === type && tag.state === true && tag.tag == customTag) {
-
-            const tagKey = `${tag.id}-${tag.type}-${customTag}`;
-
-            if (!processedTags.has(tagKey)) {
-                hasNewCards = true;
-                processedTags.add(tagKey);
-
-                const cardItem = document.createElement('li');
-                cardItem.classList.add('card', 'customTagCard');
-
-                const linkElement = document.createElement('a');
-                linkElement.classList.add('tooltip');
-                linkElement.href = tag.entryInfo.url;
-
-                const imageContainer = document.createElement('div');
-                imageContainer.classList.add('crop');
-
-                const imageElement = document.createElement('img');
-                imageElement.src = tag.entryInfo.imageUrl;
-
-                const titleElement = document.createElement('h3');
-                titleElement.classList.add('cardName');
-                titleElement.textContent = tag.entryInfo.name;
-
-                imageContainer.appendChild(imageElement);
-                linkElement.appendChild(imageContainer);
-                cardItem.appendChild(linkElement);
-                cardItem.appendChild(titleElement);
-                cardDeckElement.appendChild(cardItem);
+    Object.keys(customTags).forEach(customTag => {
+        Object.keys(customTags[customTag]).forEach(tagId => {
+            const tag = customTags[customTag][tagId];
+    
+            if (tag.type === type && tag.state === true && customTag === tagName) {
+    
+                const tagKey = `${tagId}-${tag.type}-${tagName}`;
+    
+                if (!processedTags.has(tagKey)) {
+                    hasNewCards = true;
+                    processedTags.add(tagKey);
+    
+                    const cardItem = document.createElement('li');
+                    cardItem.classList.add('card', 'customTagCard');
+    
+                    const linkElement = document.createElement('a');
+                    linkElement.classList.add('tooltip');
+                    linkElement.href = tag.entryInfo.url;
+    
+                    const imageContainer = document.createElement('div');
+                    imageContainer.classList.add('crop');
+    
+                    const imageElement = document.createElement('img');
+                    imageElement.src = tag.entryInfo.imageUrl;
+    
+                    const titleElement = document.createElement('h3');
+                    titleElement.classList.add('cardName');
+                    titleElement.textContent = tag.entryInfo.name;
+    
+                    imageContainer.appendChild(imageElement);
+                    linkElement.appendChild(imageContainer);
+                    cardItem.appendChild(linkElement);
+                    cardItem.appendChild(titleElement);
+                    cardDeckElement.appendChild(cardItem);
+                }
             }
-        }
+        });
     });
 
     if (hasNewCards) {

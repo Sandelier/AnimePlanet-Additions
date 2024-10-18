@@ -104,6 +104,7 @@ function makeInstallmentImage(statsData, toAppend) {
     const tickLocY = progressBarY + progressBarHeight + 25;
 
     ticksArray.forEach(tick => {
+
         const percentage = (tick / roundNumber(statsData.chapterCount)) * 100;
         let tickText = tick.toString();
         if (tick >= 1000 && tick < 1000000) {
@@ -123,7 +124,7 @@ function makeInstallmentImage(statsData, toAppend) {
         const tickHeight = ctx.measureText(tickText).actualBoundingBoxAscent + ctx.measureText(tickText).actualBoundingBoxDescent;
         ctx.moveTo((percentage / 100) * progressBarTotalWidth + progressBarX, tickLocY - tickHeight);
         ctx.lineTo((percentage / 100) * progressBarTotalWidth + progressBarX, (progressBarY + progressBarHeight));
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.lineWidth = 1;
         ctx.stroke();
     });
@@ -186,7 +187,7 @@ function makeDoughnutChart(statsData, toAppend, legendPosition) {
             }]
         },
         options: {
-            responsive: false,
+            responsive: true,
             plugins: {
                 legend: {
                     position: legendPosition,
