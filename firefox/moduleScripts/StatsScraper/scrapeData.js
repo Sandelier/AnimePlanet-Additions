@@ -146,6 +146,7 @@ function sendMessageToBackground(messageData) {
                     let nextPageEle = liEle.querySelector('a');
 
                     if (nextPageEle && !nextPageEle.classList.contains('next')) {
+                        nextPageEle.href = `${nextPageEle.href}&dontInjectScripts`;
                         nextPageEle.click();
                     } else {
                         sendMessageToBackground({ action: "stop" });

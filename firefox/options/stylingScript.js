@@ -44,7 +44,7 @@ function handleScroll(deltaY) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         }
     } else {
-        if (visualizerStart.getBoundingClientRect().x <= (window.innerWidth/2)) {
+        if (visualizerStart.getBoundingClientRect().x <= (window.innerWidth/1.5)) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         } else if (visualizerMain.getBoundingClientRect().top === 0) {
             scriptsPage.scrollIntoView({ behavior: 'smooth' });

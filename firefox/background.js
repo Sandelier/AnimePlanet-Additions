@@ -190,6 +190,10 @@ const injectedScripts = new Map();
 
 async function executeContentScript(url, tabId) {
 
+    if (url.includes('dontInjectScripts')) {
+        return;
+    }
+
     try {
 
 
@@ -280,8 +284,6 @@ function isScriptTypeAllowed(url, allowedArray) {
 }
 
 let moduleLoaded = false;
-let pageOpenedId;
-
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
@@ -323,26 +325,11 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 import('./moduleScripts/StatsScraper/background.js')
                     .then((module) => {
                         moduleLoaded = true;
-                        browser.windows.create({
-                            url: `https://www.anime-planet.com/users/${message.value.username}/${message.value.dataType}?per_page=560`,
-                            type: "detached_panel",
-                            width: 800,
-                            height: 600
-                        })
-                        .then((window) => {
-                            pageOpenedId = window.id;
-                        })
-                        .catch((error) => {
-                            console.error(`Error creating window: ${error}`);
-                        });
+                        if (typeof module.main === 'function') {
+                            module.main(message.value);
+                        }
                     })
                     .catch((error) => console.error("Error loading extra script:", error));
-            }
-
-        case 'stop':
-            if (pageOpenedId) {
-                browser.windows.remove(pageOpenedId)
-                pageOpenedId = "";
             }
 
         default:
@@ -400,7 +387,7 @@ browser.tabs.onActivated.addListener(onActivatedHandler);
 
 
 
-// Mangaupdates api calls. Used for "getAllNames.js"
+// Mangaupdates api calls. Used for "getMangaupdatesData.js"
 // The background script can call the api without worrying about cors unlike if you were to do it in content script.
 
 

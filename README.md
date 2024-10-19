@@ -2,7 +2,7 @@
 # AnimePlanet Additions
 Adding new features / fixing minor inconveniences that i have found in animeplanet. 
 
-Gonna add chromium someday.
+Gonna add chromium someday. (Don't trust me on this one) 
 
 ## Installation
 
@@ -18,6 +18,7 @@ You can disable/enable features in the options page of the addon. Options page i
 
 ### Acknowledgements
 * **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used for "Extra manga data" feature to fetch manga data
+* **Chart.js** ([https://www.chartjs.org/](https://www.chartjs.org/)): Chart.js is used to make charts lot easier in option page.
 
 
 ## License

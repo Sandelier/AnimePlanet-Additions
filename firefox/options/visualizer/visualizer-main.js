@@ -55,7 +55,6 @@
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.action === "scrapedData") {
-
             stillScraping = false;
             scrapeBtn.classList.toggle('deactivatedBtn');
 
@@ -64,9 +63,17 @@
 
             if (message.data.dataType === "manga") {
                 mangaStatsBtn.classList.remove('deactivatedBtn');
+                mangaStatsBtn.click();
             } else {
                 animeStatsBtn.classList.remove('deactivatedBtn');
+                animeStatsBtn.click();
             }
+            
+        } else if (message.action === "unknownUsername") {
+            usernameField.value = "";
+            stillScraping = false;
+            scrapeBtn.classList.toggle('deactivatedBtn');
+            alert('Username not found!');
         }
     });
 
@@ -114,11 +121,11 @@
     function formatDate(rawDate) {
         const date = new Date(rawDate);
 
-        const year = date.getUTCFullYear().toString().slice(-2);
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const year = date.getFullYear().toString().slice(-2);
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
         
         return `${day}/${month}/${year}-${hours}.${minutes}`;  
     }

@@ -40,7 +40,7 @@ function generateTicks(tickLimit, targetNumber) {
 }
 
 function getRandomColor() {
-    const minBrightness = 70;
+    const minBrightness = 50;
     let r, g, b, brightness;
 
     do {

@@ -3,6 +3,20 @@
 
 async function executeContentScript(url, tabId) {
     if (!doneScraping) {
+
+        if (url.startsWith('https://www.anime-planet.com/search.php?')) {
+
+            browser.runtime.sendMessage({ action: "unknownUsername"});
+
+            doneScraping = true;
+
+            if (pageOpenedId) {
+                browser.windows.remove(pageOpenedId)
+                pageOpenedId = "";
+            }
+            return;
+        }
+
         try {
             await browser.scripting.executeScript({
                 target: {
@@ -71,25 +85,28 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         browser.runtime.sendMessage({ action: "scrapedData", data: processData(scrapedData)});
         
     } else if (message.action === "scrapeUser") {
-        
-        doneScraping = false;
-        scrapedData = [];
-        browser.windows.create({
-            url: `https://www.anime-planet.com/users/${message.value.username}/${message.value.dataType}?per_page=560`,
-            type: "detached_panel",
-            width: 800,
-            height: 600
-        })
-        .then((window) => {
-            pageOpenedId = window.id;
-        })
-        .catch((error) => {
-            console.error(`Error creating window: ${error}`);
-        });
+        main(message.value);
     }
     
     return true;
 });
+
+export function main(value) {
+    doneScraping = false;
+    scrapedData = [];
+    browser.windows.create({
+        url: `https://www.anime-planet.com/users/${value.username}/${value.dataType}?per_page=560&dontInjectScripts`,
+        type: "detached_panel",
+        width: 800,
+        height: 600
+    })
+    .then((window) => {
+        pageOpenedId = window.id;
+    })
+    .catch((error) => {
+        console.error(`Error creating window: ${error}`);
+    });
+}
 
 
 
