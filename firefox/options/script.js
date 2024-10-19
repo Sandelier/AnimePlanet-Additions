@@ -36,6 +36,7 @@ function createScriptsPage(contentScripts) {
         cardContainer.className = 'option-card';
 
 
+        // Categorys is old code but well might as well leave it for now.
         let category;
         if (scriptName.startsWith('filter-')) {
             category = 'filters';
@@ -58,37 +59,22 @@ function createScriptsPage(contentScripts) {
 
         cardTop.appendChild(cardName);
 
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.classList.add('option-card-buttonContainer');
+
         // User is not meant to close them.
         if (!scriptName.startsWith('helper-')) {
-            cardTop.appendChild(createSwitchElement(script.enabled, scriptName));
+            buttonsContainer.appendChild(createSwitchElement(script.enabled, scriptName));
         }
+
+        cardTop.appendChild(buttonsContainer);
 
         cardTop.classList.add('option-card-top');
 
-        /* Middle */
-        const cardDescription = document.createElement('p');
-        cardDescription.textContent = script.description;
-
-
         cardContainer.appendChild(cardTop);
-        cardContainer.appendChild(cardDescription);
-
-        /* Bottom */
-
-        if (scriptName.startsWith('wip/')) {
-            const cardWip = document.createElement('button');
-            cardWip.classList.add('card-wip');
-
-            const cardWipText = document.createElement('p');
-
-            cardWipText.textContent = script.wipText;
-            cardWipText.classList.add('card-wip-tooltip');
-
-            cardWip.appendChild(cardWipText);
-            cardContainer.appendChild(cardWip);
-        }
 
 
+        // Card settings
         if (script.changeableData) {
             const cardSettings = document.createElement('button');
             cardSettings.classList.add('card-settings');
@@ -116,8 +102,42 @@ function createScriptsPage(contentScripts) {
                 }
             });
 
-            cardContainer.appendChild(cardSettings);
+            buttonsContainer.insertBefore(cardSettings, buttonsContainer.firstChild);
         }
+
+
+        // Card tooltip
+        const cardTooltip = document.getElementById('card-tooltip');
+
+        cardContainer.addEventListener('mousemove', (e) => {
+            const card = e.target.closest('.option-card');
+        
+            if (card) {
+
+                const isChild = e.target.closest('.option-card-buttonContainer');
+                if (isChild) {
+                    cardTooltip.style.visibility = 'hidden';
+                    return;
+                }
+
+                const tooltipText = script.description;
+                cardTooltip.textContent = tooltipText;
+            
+                const tooltipHeight = cardTooltip.offsetHeight;      
+            
+                cardTooltip.style.left = e.pageX + 'px'; 
+                cardTooltip.style.top = (e.pageY - tooltipHeight) + 'px'; 
+                cardTooltip.style.visibility = 'visible';
+            } else {
+                cardTooltip.style.visibility = 'hidden';
+            }
+        });
+
+        cardContainer.addEventListener('mouseleave', () => {
+            cardTooltip.style.visibility = 'hidden';
+        });
+
+
 
         scriptsContainer.appendChild(cardContainer);
     }
@@ -132,34 +152,6 @@ for (let i = 0; i < localStorage.length; i++) {
 }
 
 createScriptsPage(localStorageData.contentScripts);
-
-
-// Scripts page filter buttons.
-document.getElementById('button-sidebar').addEventListener('click', function(event) {
-    if (event.target.tagName === 'BUTTON') {
-
-        const buttons = document.querySelectorAll('#button-sidebar button');
-        buttons.forEach(button => {
-            button.classList.remove('btn-active');
-        });
-
-        event.target.classList.add('btn-active');
-
-        const category = event.target.textContent.toLowerCase();
-        filterCards(category);
-    }
-});
-
-function filterCards(category) {
-    const cards = document.querySelectorAll('.option-card');
-    cards.forEach(card => {
-        if (category === 'all' || card.getAttribute('data-category') === category) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
 
 // Overlay
 

@@ -56,7 +56,8 @@ body {
   }
 
 #homePage > h1,
-#visualizerMain > h1 {
+#visualizerMain > h1,
+#featuresContainer > h1 {
     font-size: 4rem;
     font-family: "Allan", cursive;
     font-weight: 400;
@@ -148,76 +149,60 @@ body {
     justify-content: center;
 }
 
-/* Buttons */
-
-#button-sidebar {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    padding: 20px;
-}
-
-
-#button-sidebar > button {
-    background: none;
-    border: none;
-    font-size: 1.3rem;
-
-    /* https://stackoverflow.com/a/76249433 */
-    color: transparent;
-    background-image: linear-gradient(90deg, #d599ff 50%, black 50%);
-    background-position: 100%;
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    
-    transition: background-position 0.4s ease;
-
-    cursor: pointer;
-}
-
-#button-sidebar > button:hover {
-    background-position: 0;
-}
-
-.btn-active {
-    color: #d599ff !important;
+#featuresContainer {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: Center;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Options */
 
 .option-card {
-    width: 350px;
-    height: 150px;
-    background-color: #aeaeff;
-    color: black;
-    border-radius: 5px;
+  background-color: transparent;
+  color: black;
+  border-radius: 5px;
+  box-shadow: 4px 10px 5px 0px rgba(0,0,0,0.75);
+  padding: 10px;
+  border: solid 1px black;
+  transition: 0.3s;
+}
 
-    box-shadow: 4px 10px 5px 0px rgba(0,0,0,0.75);
-
-    padding: 10px;
-
-    border: solid 1px white;
+.option-card:hover {
+  transform: scale(1.1);
+  color: #fff;
+  background-color: rgb(35, 38, 59);
+  border: 1px solid white;
 }
 
 .option-card-top {
-    justify-content: space-between;
-    display: flex;
-    border-bottom: solid 1px #8383bd;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+
+.option-card-top > label {
+  user-select: none;
+}
+
+.option-card-top > div {
+  display: flex;
+  align-items: center;
 }
 
 #scripts-container {
-    padding: 0px 20px 20px 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 0fr));
+    padding: 10px 20px 20px 20px;
     gap: 20px;
-    width: 100%;
+    width: calc(200px + 55%);
     overflow-y: scroll;
     max-height: calc(90% - 15px) !important;
     justify-content: center;
-
-    scrollbar-width: none; 
-  -ms-overflow-style: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 0fr));
 }
 
 #scripts-container::-webkit-scrollbar {
@@ -234,6 +219,7 @@ body {
     display: inline-block;
     width: calc(60px / 1.5);
     height: calc(34px / 1.5);
+    margin-left: 5px;
 }
 
 .switch input { 
@@ -286,62 +272,53 @@ input:checked + .slider:before {
 
 /* Settings */
 
-.card-wip,
-.card-settings {
-    background: none;
-    border: none;
-
-    cursor: pointer;
-
-    width: 30px;
-    height: 28px;
-
-    background-repeat: no-repeat;
-    transition: transform 0.2s;
-    background-size: cover;
-}
-
-.card-wip {
-  float: left;
-  background-image: url('../images/wip.svg');
-  width: 0px;
-  height: 32px;
-  
-}
 
 .card-settings {
-  float: right;
+  background: none;
+  background-repeat: repeat;
+  background-image: none;
+  background-size: auto;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 22px;
+  background-repeat: no-repeat;
+  transition: transform 0.2s;
+  background-size: cover;
+}
+
+
+.card-settings {
   background-image: url('../images/settings.svg');
 }
 
-.card-wip:hover,
 .card-settings:hover {
     transform: scale(1.2);
 }
 
+.option-card:hover .card-settings {
+  filter: invert();
+}
+
 
 /* Tooltip */
-/* https://www.w3schools.com/css/css_tooltip.asp */
 
-.card-wip-tooltip {
-  visibility: hidden;
-  width: 250px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  
+#card-tooltip {
   position: absolute;
-  z-index: 1;
-  top: -50%;
-  left: 200%;
+  background-color: rgba(0, 0, 0, 0.85);
+  border-radius: 5px;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 300px;
+  padding: 5px;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: white;
+  font-weight: 500;
+  font-family: "Mulish", "Roboto", sans-serif;
 }
-
-.card-wip:hover .card-wip-tooltip{
-  visibility: visible
-}
-
 
 /* Visualizer page */
 

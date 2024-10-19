@@ -96,7 +96,7 @@ browser.runtime.onInstalled.addListener(() => {
             "filter-contains.js": {
                 formattedName: "Contains filtering",
                 enabled: false,
-                description: "Filters entries that dont contain any of the tags defined.",
+                description: "Filters entries that dont contain any of the tags defined in current page.",
             },
             "wip/list-removeEntry.js": {
                 formattedName: "List entry remover",
