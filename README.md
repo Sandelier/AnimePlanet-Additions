@@ -5,8 +5,8 @@ Includes small list visualizer, but there's an button to export the data so you 
 
 Gonna add chromium someday. (Don't trust me on this one) 
 
-![Features](Screenshots/Features.png)
-![Visualizer](Screenshots/Visualizer.png)
+![Features](Screenshots/Features.png?)
+![Visualizer](Screenshots/Visualizer.png?)
 
 ## Installation
 
