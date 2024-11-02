@@ -3,7 +3,7 @@
 // https://www.anime-planet.com/forum/threads/request-quality-of-life-improvements.343089/
 
 (function() {
-    injectedScripts.push("add-EntryNotes.js");
+    window.postMessage({ action: "injectedScript", name: "add-EntryNotes.js" });
 
     
     const styleElement = document.createElement('style');
@@ -76,7 +76,7 @@ function addNote(notesArray) {
 function createDomStructure(note) {
     // reviews, recommendations and etc container
 
-    const relatedInfoEle = document.querySelector('#entry > div:nth-child(3)');
+    const relatedInfoEle = document.querySelector('#entry > div.pure-1:not([class*=" "])');
 
     const titleEle = document.createElement('h2');
     titleEle.textContent = "Notes";

@@ -4,7 +4,7 @@
 
 (function() {
 
-    injectedScripts.push("load-extrapages.js");
+    window.postMessage({ action: "injectedScript", name: "load-extrapages.js" });
 
     function getNextPageBtn() {
 

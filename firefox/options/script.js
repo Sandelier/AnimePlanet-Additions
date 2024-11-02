@@ -55,6 +55,25 @@ function createScriptsPage(contentScripts) {
         const cardName = document.createElement('label');
         cardName.textContent = script.formattedName;
 
+        cardContainer.classList.add('notSupported');
+        if (script.mobile) {
+            cardName.textContent += " 📱";
+            if (isMobile()) {
+                cardContainer.classList.remove('notSupported');
+            }
+        }
+        
+        if (script.desktop) {
+            cardName.textContent += " 🖥️";
+            if (!isMobile()) {
+                cardContainer.classList.remove('notSupported');
+            }
+        }
+
+        if (script.wip) {
+            cardContainer.classList.add('featureWIP')
+        }
+
         const cardTop = document.createElement('div');
 
         cardTop.appendChild(cardName);

@@ -4,7 +4,7 @@
 
 let tooltipData = [];
 
-injectedScripts.push("helper-parseTooltips.js");
+window.postMessage({ action: "injectedScript", name: "helper-parseTooltips.js" });
 
 function parseTooltips(dispatch = false) {
     tooltipData = [];

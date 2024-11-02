@@ -3,7 +3,7 @@
 
 (function() {
 
-    injectedScripts.push("forum-clickableUsername.js");
+    window.postMessage({ action: "injectedScript", name: "forum-clickableUsername.js" });
     
     const usernameElement = document.querySelector('.memberHeader-nameWrapper > span.username');
     

@@ -2,7 +2,7 @@
 
 (function() {
 
-	injectedScripts.push("getMangaupdatesData.js");
+	window.postMessage({ action: "injectedScript", name: "getMangaupdatesData.js" });
 
 	const mangaNameElement = document.querySelector('#siteContainer > h1');
 
@@ -188,47 +188,16 @@
               width: 16% !important;
             }
           }
-
-
-          #siteContainer > h2.aka {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
-          }
-
-          h2.aka > p {
-            border: solid 1px;
-            padding: 1px 5px;
-            margin: 0;
-          }
-
         `;
 
 		document.head.appendChild(style);
 
 
-		// Modifying the alt titles since normally they are quite ugly.
 		let altTitles = document.querySelector('h2.aka');
-
 		if (!altTitles) {
 			altTitles = document.createElement('h2');
 			altTitles.classList.add('aka');
 			mangaNameElement.parentNode.insertBefore(altTitles, mangaNameElement.nextSibling);
-		} else {
-			const textContent = altTitles.textContent;
-
-			const [prefix, titles] = textContent.split(': ');
-
-			const titlesArray = titles.split(', ');
-
-			altTitles.textContent = prefix + ':';
-
-			titlesArray.forEach(title => {
-				const pElement = document.createElement('p');
-				pElement.textContent = title;
-				altTitles.appendChild(pElement);
-			});
 		}
 
 

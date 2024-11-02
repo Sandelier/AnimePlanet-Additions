@@ -3,7 +3,7 @@
 
 
 (function() {
-    injectedScripts.push("customTags.js");
+    window.postMessage({ action: "injectedScript", name: "customTags.js" });
 })();
 
 const styleElement = document.createElement('style');

@@ -4,7 +4,7 @@
 
 (function() {
 
-    injectedScripts.push("wip/list-removeEntry.js");
+    window.postMessage({ action: "injectedScript", name: "wip/list-removeEntry.js" });
 
     const styleElement = document.createElement('style');
     

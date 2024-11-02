@@ -1,7 +1,7 @@
 
 
 (function() {
-    injectedScripts.push("stillLeft.js");
+    window.postMessage({ action: "injectedScript", name: "stillLeft.js" });
 
 
     tooltipData.forEach(item => {

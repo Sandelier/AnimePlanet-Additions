@@ -4,7 +4,7 @@
 
 (function() {
 
-    injectedScripts.push("filter-autoFilter.js");
+    window.postMessage({ action: "injectedScript", name: "filter-autoFilter.js" });
 
     const tagsContainer = document.getElementById("multipletags");
     const otherContainer = document.querySelector('#showonly > .af-filters');

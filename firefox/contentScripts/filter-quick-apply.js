@@ -3,7 +3,7 @@
 
 (function() {
 
-    injectedScripts.push("filter-quick-apply.js");
+    window.postMessage({ action: "injectedScript", name: "filter-quick-apply.js" });
 
     function createQuickApplyBtn() {
         const quickApplyBtn = document.createElement("button");

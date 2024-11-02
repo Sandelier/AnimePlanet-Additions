@@ -6,6 +6,7 @@ browser.runtime.onInstalled.addListener(() => {
     const defaultSettings = {
         pagesToSearch: 1,
 
+        customTitles: {},
         customTags: {},
 
         autoFilters: {
@@ -25,31 +26,41 @@ browser.runtime.onInstalled.addListener(() => {
                 formattedName: "Track scripts",
                 enabled: true,
                 description: "Helper script to keep track of current scripts in the page.",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "helper-browserSpecifics.js": { 
                 formattedName: "Browser specifics",
                 enabled: true,
                 description: "Helper script to make content scripts work for chromium and firefox.",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "helper-parseTooltips.js": { 
                 formattedName: "Tooltip parse",
                 enabled: true,
                 description: "Helper script to parse tooltips from mangas/animes so we dont need to do expensive calls for each script.",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: false,
+                desktop: true
             },
             "helper-filter-newTabEntries.js": {
                 formattedName: "Easier filter tabs",
                 enabled: true,
                 description: "Helper script to add new filter methods.",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "helper-interceptFetch.js": { 
                 formattedName: "Intercept fetch",
                 enabled: true,
                 description: "Intercepts fetch calls that animeplanet makes. Currently used for custom lists",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "load-extrapages.js": {
                 formattedName: "Extra pages",
@@ -60,22 +71,30 @@ browser.runtime.onInstalled.addListener(() => {
                     "https://www.anime-planet.com/anime/all",
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
                 ],
-                changeableData: "pagesToSearch"
+                changeableData: "pagesToSearch",
+                mobile: true,
+                desktop: true
             },
             "filter-applyBtn-AlwaysOn.js": {
                 formattedName: "Apply button shown",
                 enabled: false,
-                description: "Makes the apply button on filters to be always shown."
+                description: "Makes the apply button on filters to be always shown.",
+                mobile: true,
+                desktop: true
             },
             "filter-quick-apply.js": {
                 formattedName: "Quick apply",
                 enabled: false,
-                description: "New button to filter current mangas/animes in the page without loading next page."
+                description: "New button to filter current mangas/animes in the page without loading next page.",
+                mobile: false,
+                desktop: true
             },
             "filter-tags-search.js": {
                 formattedName: "Tags search",
                 enabled: false,
-                description: "Adds an search bar for tags."
+                description: "Adds an search bar for tags.",
+                mobile: true,
+                desktop: true
             },
             "forum-clickableUsername.js": {
                 formattedName: "Clickable usernames",
@@ -83,7 +102,9 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Makes usernames clickable in forum profile",
                 allowedUrls: [
                     "https:\\/\\/www\\.anime-planet\\.com\\/forum\\/members\\/[^\\.]+\\.\\d+\\/"
-                ]
+                ],
+                mobile: true,
+                desktop: true
             },
             "filter-chapter.js": {
                 formattedName: "Chapter filtering",
@@ -91,12 +112,16 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Adds chapter filtering in current page.",
                 allowedUrls: [
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/manga"
-                ]
+                ],
+                mobile: false,
+                desktop: true
             },
             "filter-contains.js": {
                 formattedName: "Contains filtering",
                 enabled: false,
                 description: "Filters entries that dont contain any of the tags defined in current page.",
+                mobile: false,
+                desktop: true
             },
             "wip/list-removeEntry.js": {
                 formattedName: "List entry remover",
@@ -105,22 +130,18 @@ browser.runtime.onInstalled.addListener(() => {
                 allowedUrls: [
                     "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
                 ],
-                wipText: "Currently the script can only handle lists that dont have extra pages."
-            },
-            "list-multiselect.js": {
-                formattedName: "List multiselect",
-                enabled: false,
-                description: 'Allows you to select multiple custom lists that you want to add the entry to',
-                allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
-                ]
+                wip: true,
+                mobile: true,
+                desktop: true
             },
             "filter-autoFilter.js": { 
                 formattedName: "Auto filters",
                 enabled: false,
                 description: "Adds filters automatically",
                 allowedUrls: [],
-                changeableData: "autoFilters"
+                changeableData: "autoFilters",
+                mobile: true,
+                desktop: true
             },
             "getMangaupdatesData.js": { 
                 formattedName: "Extra manga data",
@@ -128,19 +149,26 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Adds an button to fetch mangaupdate's data and add it to the manga page.",
                 allowedUrls: [
                     "https://www.anime-planet.com/manga/"
-                ]
+                ],
+                mobile: true,
+                wip: true,
+                desktop: true
             },
             "add-EntryNotes.js": { 
                 formattedName: "Notes",
                 enabled: false,
                 description: "Allows you to add notes to any manga/anime",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "customTags.js": { 
                 formattedName: "Custom tags",
                 enabled: false,
                 description: "Allows creating and adding of custom tags to entries",
-                allowedUrls: []
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
             },
             "stillLeft.js": { 
                 formattedName: "Still left",
@@ -148,8 +176,48 @@ browser.runtime.onInstalled.addListener(() => {
                 description: "Shows episodes or chapters still left on entry.",
                 allowedUrls: [
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)\/(?:dropped|reading|watching|stalled)"
-                ]
-            }
+                ],
+                mobile: false,
+                desktop: true
+            },
+            "mobile/showFiltering.js": { 
+                formattedName: "Shows filter options",
+                enabled: false,
+                description: "Shows filter options for screens that are smaller than 768px wide",
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
+                ],
+                mobile: true,
+                desktop: true
+            },
+            "list-multiselect.js": {
+                formattedName: "List multiselect",
+                enabled: false,
+                description: 'Allows you to select multiple custom lists that you want to add the entry to',
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
+                ],
+                mobile: true,
+                desktop: true
+            },
+            "customTitleName.js": {
+                formattedName: "Custom entry title",
+                enabled: false,
+                description: 'Allows you to set the title of an entry. Press enter to toggle between custom and orginal title.',
+                allowedUrls: [],
+                mobile: true,
+                desktop: true
+            },
+            "cleanerAltTitles.js": {
+                formattedName: "Cleaner alt titles",
+                enabled: false,
+                description: "Splits alt titles from commas into blocks",
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
+                ],
+                mobile: true,
+                desktop: true
+            },
         }
     };
 
@@ -196,17 +264,24 @@ async function executeContentScript(url, tabId) {
 
     try {
 
-
-        // If injected scripts is empty it might mean that background script has went idle so we have to ask the trackscripts helper if there are content scripts in the page
+        // If injected scripts is empty it might mean that background script has went idle so we need to retrieve the injected scripts.
         if (!injectedScripts.has(tabId)) {
             try {
-                const response = await browser.tabs.sendMessage(tabId, { action: 'getInjectedScripts'})
-                if (response && response.scripts) {
-                    injectedScripts.set(tabId, new Set(response.scripts));
-                    console.log(injectedScripts.get(tabId));
+                const results = await browser.scripting.executeScript({
+                    target: { tabId: tabId },
+                    func: () => {
+                        const apfeaturesEle = document.getElementById('apfeatures-injectedScripts');
+                        return apfeaturesEle ? apfeaturesEle.dataset.currentScripts : null;
+                    },
+                });
+
+                if (results && results[0] && results[0].result) {
+                    const scripts = JSON.parse(results[0].result);
+                    injectedScripts.set(tabId, new Set(scripts));
                 }
+
             } catch (error) {
-                console.error('Error retrieving injected scripts.', error);
+                console.log(`Error occured while trying to retrieve injected scripts: ${error}`)
             }
         }
 
@@ -258,6 +333,7 @@ async function executeContentScript(url, tabId) {
                 }
             }
         }
+
 
     } catch (error) {
         console.error('Failed to execute content script:', error);
@@ -318,7 +394,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             } else {
                 console.warn('Missing manga name for getMangaInfo');
             }
-
+            break;
         case 'scrapeUser':
 
             if (!moduleLoaded) {
@@ -331,7 +407,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     })
                     .catch((error) => console.error("Error loading extra script:", error));
             }
-
+            break;
         default:
             console.warn('Unknown action:', message.action);
             break;
@@ -432,6 +508,7 @@ async function fetchMangaByName(name) {
       },
       body: JSON.stringify(payload)
     });
+    
 
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);

@@ -170,11 +170,26 @@ body {
   transition: 0.3s;
 }
 
-.option-card:hover {
+.option-card:not(.notSupported):hover {
   transform: scale(1.1);
   color: #fff;
   background-color: rgb(35, 38, 59);
   border: 1px solid white;
+}
+
+.notSupported > .option-card-top > .option-card-buttonContainer {
+  display: none;
+}
+
+.notSupported {
+  cursor: not-allowed;
+  background-color: rgb(72, 72, 72);
+  color: white;
+  border: 1px solid white;
+}
+
+.featureWIP {
+  background-color: #fff998;;
 }
 
 .option-card-top {
@@ -202,7 +217,7 @@ body {
     scrollbar-width: none;
     -ms-overflow-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 0fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 0fr));
 }
 
 #scripts-container::-webkit-scrollbar {

@@ -2,7 +2,9 @@
 
 // https://www.anime-planet.com/forum/threads/multiselect-for-assigning-custom-lists.351332/
 
-injectedScripts.push("list-multiselect.js");
+(function() {
+    window.postMessage({ action: "injectedScript", name: "list-multiselect.js" });
+})();
 
 window.addEventListener("message", (event) => {
     if (event.source == window && event.data && event.data.action == "userCustomLists") {

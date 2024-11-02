@@ -2,7 +2,7 @@
 
 (function() {
 
-    injectedScripts.push("filter-contains.js");
+    window.postMessage({ action: "injectedScript", name: "filter-contains.js" });
 
     const pillBottle = document.querySelector('.pillBottle');
 

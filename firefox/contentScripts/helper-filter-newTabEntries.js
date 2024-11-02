@@ -1,7 +1,9 @@
 
 
 
-injectedScripts.push("helper-filter-newTabEntries.js");
+
+window.postMessage({ action: "injectedScript", name: "helper-filter-newTabEntries.js" });
+
 
 (function() {
 

@@ -2,7 +2,7 @@
 
 (function() {
 
-    injectedScripts.push("filter-tags-search.js");
+    window.postMessage({ action: "injectedScript", name: "filter-tags-search.js" });
 
     function createSearchElement() {
         const searchElement = document.createElement("input");

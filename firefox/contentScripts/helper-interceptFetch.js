@@ -2,7 +2,8 @@
 
 (function() {
 
-    injectedScripts.push("helper-interceptFetch.js");
+    window.postMessage({ action: "injectedScript", name: "helper-interceptFetch.js" });
+
 
     // Injecting the fetch interceptor to document.
 	var script = document.createElement('script');

@@ -1,3 +1,4 @@
+
 let touchStartY = 0;
 let touchEndY = 0;
 
@@ -18,6 +19,22 @@ document.addEventListener('touchend', () => {
     handleScroll(deltaY);
 });
 
+function isMobile() {
+    const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+    
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
+
 const scriptsPage = document.getElementById('scriptsPage');
 const visualizerMain = document.getElementById('visualizerMain');
 const homePage = document.getElementById('homePage');
@@ -26,9 +43,10 @@ const visualizerStart = document.getElementById('visualizerStart');
 homePage.scrollIntoView();
 
 window.addEventListener('resize', (event) => {
-    homePage.scrollIntoView();
+    if (!isMobile()) {
+        homePage.scrollIntoView();
+    }
 });
-
 function handleScroll(deltaY) {
     const scriptsContainer = document.getElementById('scripts-container');
     if (scriptsContainer.contains(event.target) && scriptsContainer != event.target) {
@@ -44,25 +62,36 @@ function handleScroll(deltaY) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         }
     } else {
-        if (visualizerStart.getBoundingClientRect().x <= (window.innerWidth/1.5)) {
+        if (!isMobile() && visualizerStart.getBoundingClientRect().x <= (window.innerWidth/1.5)) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         } else if (visualizerMain.getBoundingClientRect().top === 0) {
             scriptsPage.scrollIntoView({ behavior: 'smooth' });
         } else if (scriptsPage.getBoundingClientRect().top === 0) {
             homePage.scrollIntoView({ behavior: 'smooth' });
-        } else if (visualizerStats.getBoundingClientRect().top === 0) {
+        } else if (!isMobile() &&visualizerStats.getBoundingClientRect().top === 0) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
 
 
-
-
 document.getElementById('featuresBtn').addEventListener('click', (event) => {
     scriptsPage.scrollIntoView({ behavior: 'smooth' });
 });
 
-document.getElementById('visualizerBtn').addEventListener('click', (event) => {
-    visualizerPage.scrollIntoView({ behavior: 'smooth' });
+const visualizerBtn = document.getElementById('visualizerBtn');
+
+visualizerBtn.addEventListener('click', (event) => {
+    if (!visualizerBtn.classList.contains('deactivatedBtn')) {
+        visualizerPage.scrollIntoView({ behavior: 'smooth' });
+    }
 });
+
+
+if (isMobile()) {
+    document.getElementById('visualizerPage').remove();
+    visualizerBtn.classList.add('deactivatedBtn');
+    visualizerStats.remove();
+    visualizerStart.remove();
+    visualizerMain.remove();
+}

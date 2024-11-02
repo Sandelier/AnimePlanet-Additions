@@ -1,7 +1,7 @@
 
 
 (function() {
-    injectedScripts.push("helper-browserSpecifics.js");
+    window.postMessage({ action: "injectedScript", name: "helper-browserSpecifics.js" });
 })();
 
 async function requestFirefox(action, type, value) {
