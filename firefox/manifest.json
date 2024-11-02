@@ -4,7 +4,7 @@
   {
     "manifest_version": 3,
     "name": "Animeplanet Additions",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Extension to add features and fixing inconveniences i have had with animeplanet.",
     "permissions": [
       "tabs",
