@@ -3,8 +3,6 @@
 Adding new features / fixing minor inconveniences that i've found in AnimePlanet.
 Includes small list visualizer, but there's an button to export the data so you can make an better one if you want to.
 
-Gonna add chromium someday. (Don't trust me on this one) 
-
 ![Features](Screenshots/Features.png?)
 ![Visualizer](Screenshots/Visualizer.png?)
 
@@ -16,6 +14,10 @@ Gonna add chromium someday. (Don't trust me on this one)
 
 ### Firefox
 Extension can be found in Mozilla's add-on page: [AnimePlanet Additions](https://addons.mozilla.org/en-US/firefox/addon/animeplanet-additions/)
+
+### Chromium
+Extension for chromium can currently only be installed as an temporary addon by downloading the zip file in releases. 
+I will be uploading the extension to chrome webstore later on.
 
 ### Options page
 You can enable/disable features on the options page of the addon. You can access it through clicking the popup
