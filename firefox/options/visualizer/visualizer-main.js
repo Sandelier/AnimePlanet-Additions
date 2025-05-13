@@ -31,7 +31,19 @@
     
         let stillScraping = false;
     
-        scrapeBtn.addEventListener('click', function() {
+        scrapeBtn.addEventListener('click', async function() {
+            if (isMobile() && browserType && browserType != "chrome") {
+
+                const granted = await browser.permissions.request({
+                    permissions: ['webRequest', 'webRequestBlocking']
+                });
+                
+                if (!granted) {
+                  alert("Permissions are required to enable this feature.");
+                  return false;
+                }
+            }
+
             if (!stillScraping) {
     
                 const selectedType = document.querySelector('.dataTypeSelected').textContent.trim().toLowerCase();
@@ -50,6 +62,8 @@
     
                 scrapeBtn.classList.toggle('deactivatedBtn');
                 stillScraping = true;
+
+
                 browser.runtime.sendMessage({ action: "scrapeUser", requestType: "", value: {username: username, dataType: selectedType}});
             }
         });
@@ -60,7 +74,7 @@
                 scrapeBtn.classList.toggle('deactivatedBtn');
     
                 const storageKey = `stats-${message.data.dataType}`;
-                localStorage.setItem(storageKey, JSON.stringify(message.data));
+                browser.storage.local.set({ [storageKey]: JSON.stringify(message.data) });
     
                 if (message.data.dataType === "manga") {
                     mangaStatsBtn.classList.remove('deactivatedBtn');
@@ -85,9 +99,11 @@
         let visualizerStats = document.getElementById('visualizerStats');
     
         function activateButton(button, type) {
-            if (localStorageData[`stats-${type}`]) {
-                button.classList.remove('deactivatedBtn');
-            }
+            browser.storage.local.get([`stats-${type}`], (result) => {
+                if (result[`stats-${type}`]) {
+                    button.classList.remove('deactivatedBtn');
+                }
+            });
     
             button.addEventListener('click', function() {
                 if (!button.classList.contains('deactivatedBtn')) {
@@ -99,22 +115,41 @@
                     visualizerTopBottom.innerHTML = '';
                     visualizerBottom.innerHTML = '';
     
-                    let stats = JSON.parse(localStorage.getItem(`stats-${type}`));
-    
-                    let sourcesProcessed = processStatsData(stats.sources, { index: 1, limit: 10, bgColors: [] });
-                    let typesProcessed = processStatsData(stats.types, { index: 0, limit: 10, bgColors: [] });
-                    let tagsProcessed = processStatsData(stats.tags, { index: 2, limit: 20, bgColors: [] });
-    
-                    makeBarChart(tagsProcessed, visualizerBottom);
-    
-                    makeDoughnutChart(sourcesProcessed, visualizerTopBottom, "right");
-                    makeInstallmentImage(stats, visualizerTopBottom);
-                    makeDoughnutChart(typesProcessed, visualizerTopBottom, "left");
-    
-                    visualizerStart.setAttribute('dataType', type);
-    
-                    document.querySelector('#visualizerStats-header h1').textContent = `${stats.username}'s ${type} list`;
-                    document.querySelector('#visualizerStats-header p').textContent = `Data date: ${formatDate(stats.dataDate)}`;
+                    browser.storage.local.get([`stats-${type}`], (result) => {
+                        let stats = JSON.parse(result[`stats-${type}`]);
+
+                        let sourcesProcessed = processStatsData(stats.sources, { index: 1, limit: 10, bgColors: [] });
+                        let typesProcessed = processStatsData(stats.types, { index: 0, limit: 10, bgColors: [] });
+
+                        // Rounding up the limit by tenths if its more than 10
+                        let widthFactor = Math.floor(window.innerWidth / 100);
+                        let limit = widthFactor < 10 ? widthFactor : Math.ceil(widthFactor / 10) * 10;
+                        let tagsProcessed = processStatsData(stats.tags, { index: 2, limit, bgColors: [] });        
+
+                        if (window.innerWidth < 1600) {
+
+                            visualizerTopBottom.style.flexDirection = 'column';
+                            visualizerTopBottom.style.overflow = 'scroll';
+                            visualizerStats.style.padding = '10px';
+
+                            makeInstallmentImage(stats, visualizerTopBottom);
+
+                            makeDoughnutChart(sourcesProcessed, visualizerTopBottom, "right");
+                            makeDoughnutChart(typesProcessed, visualizerTopBottom, "right");
+
+                            makeBarChart(tagsProcessed, visualizerTopBottom);
+                        } else {
+                            makeBarChart(tagsProcessed, visualizerBottom);
+                            makeDoughnutChart(sourcesProcessed, visualizerTopBottom, "right");
+                            makeInstallmentImage(stats, visualizerTopBottom);
+                            makeDoughnutChart(typesProcessed, visualizerTopBottom, "left");
+                        }
+        
+                        visualizerStart.setAttribute('dataType', type);
+        
+                        document.querySelector('#visualizerStats-header h1').textContent = `${stats.username}'s ${type} list`;
+                        document.querySelector('#visualizerStats-header p').textContent = `Data date: ${formatDate(stats.dataDate)}`;
+                    });
                 }
             });
         }
@@ -138,20 +173,20 @@
         document.getElementById('exportJsonDataBtn').addEventListener('click', function() {
             let dataType = visualizerStart.getAttribute('dataType');
             
-            const data = JSON.stringify(JSON.parse(localStorage[`stats-${dataType}`]), null, 2);
+            browser.storage.local.get([`stats-${dataType}`], (result) => {
+                const data = JSON.stringify(JSON.parse(result[`stats-${dataType}`]), null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
             
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-        
-            const link = document.createElement('a');
-            link.download = `ap-visualizer-export-${dataType}-.json`;
-            link.href = url;
-        
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+                const link = document.createElement('a');
+                link.download = `ap-visualizer-export-${dataType}-.json`;
+                link.href = url;
+            
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            });
         });
-    
     }
 }())

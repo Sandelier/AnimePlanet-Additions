@@ -1,52 +1,106 @@
 
+const browserType = typeof browser !== "undefined" ? "firefox" : "chrome";
+var browser = browser || chrome;
 
-function createSwitchElement(enabled, scriptName) {
-    const label = document.createElement("label");
-    label.classList.add("switch");
-  
-    const input = document.createElement("input");
-    input.setAttribute("type", "checkbox");
-    if (enabled) {
-        input.setAttribute("checked", "checked");
+async function requestPermissions(permissions, origins = []) {
+    try {
+        const granted = await browser.permissions.request({ permissions, origins });
+        if (!granted) {
+            alert("Permissions are required to enable this feature.");
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error("Error requesting permissions:", error);
+        return false;
     }
-  
-    const span = document.createElement("span");
-    span.classList.add("slider");
-  
-    label.appendChild(input);
-    label.appendChild(span);
-
-    input.addEventListener("change", function() {
-        localStorageData.contentScripts[scriptName].enabled = input.checked;
-        localStorage.setItem('contentScripts', JSON.stringify(localStorageData.contentScripts));
-
-    });
-  
-    return label;
 }
+
+function toggleScript(cardContainer, enabled, scriptName) {
+    cardContainer.addEventListener("click", async function(event) {
+
+        if (event.target.classList.contains("card-settings")) return;
+
+        const currentState = cardContainer.dataset.enabled === "true";
+        const newState = !currentState;
+
+        cardContainer.dataset.enabled = newState.toString();
+        
+        if (scriptName === "entry/getMangaupdatesData.js" && newState) {
+            const permissions = browserType === "chrome" ? [] : ['webRequest', 'webRequestBlocking'];
+            const granted = await requestPermissions(permissions, ['https://api.mangaupdates.com/*']);
+            if (!granted) return;
+        }
+        
+        const dependencies = getAllDependencies(scriptName);
+        
+        if (isMobile() && dependencies.includes("helper/PC-Mode.js")) {
+
+            if (browserType === "firefox") {
+                const granted = await requestPermissions(['webRequest', 'webRequestBlocking']);
+                if (!granted) return;
+            }
+            
+            browser.runtime.sendMessage({
+                action: 'PCMode',
+                value: newState
+            });
+        }
+        
+
+        localStorageData.contentScripts[scriptName].enabled = newState;
+        browser.storage.local.set({ 'contentScripts': localStorageData.contentScripts });
+
+        cardContainer.classList.toggle('option-card-enabled', newState);
+
+        console.log(`${scriptName} is now ${newState ? 'enabled' : 'disabled'}`);
+    });
+
+    cardContainer.dataset.enabled = enabled.toString();
+    cardContainer.classList.toggle('option-card-enabled', enabled);
+}
+
+// Travels through all dependencies of an script and returns the names of the script
+function getAllDependencies(scriptName) {
+    const dependencies = new Set();
+
+    function collectDeps(name) {
+
+        if (!localStorageData.contentScripts[name].dependencies) {
+            return;
+        }
+
+        for (const dep of localStorageData.contentScripts[name].dependencies) {
+            if (!dependencies.has(dep)) {
+                dependencies.add(dep);
+                collectDeps(dep);
+            }
+        }
+    }
+
+    collectDeps(scriptName);
+    return Array.from(dependencies);
+}
+
+
 
 const scriptsContainer = document.getElementById('scripts-container');
 function createScriptsPage(contentScripts) {
 
-    for (const scriptName in contentScripts) {
+    const abcOrder = Object.keys(contentScripts).sort();
+    const reorderedScripts = [
+        ...abcOrder.filter(scriptName => !scriptName.startsWith("helper")),
+        ...abcOrder.filter(scriptName => scriptName.startsWith("helper"))
+    ];
+
+    for (const scriptName of reorderedScripts) {
 
         const script = contentScripts[scriptName];
 
         const cardContainer = document.createElement('div');
         cardContainer.className = 'option-card';
 
-
-        // Categorys is old code but well might as well leave it for now.
-        let category;
-        if (scriptName.startsWith('filter-')) {
-            category = 'filters';
-        } else if (scriptName.startsWith('forum-')) {
-            category = 'forums';
-        } else if (scriptName.startsWith('helper-')) {
-            category = 'helpers';
-        } else {
-            category = 'other';
-        }
+        const category = scriptName.split('/')[0];
 
         // Set the category attribute
         cardContainer.setAttribute('data-category', category);
@@ -55,22 +109,32 @@ function createScriptsPage(contentScripts) {
         const cardName = document.createElement('label');
         cardName.textContent = script.formattedName;
 
-        cardContainer.classList.add('notSupported');
-        if (script.mobile) {
-            cardName.textContent += " 📱";
-            if (isMobile()) {
-                cardContainer.classList.remove('notSupported');
+
+        if (!script.mobile || !script.desktop) {
+            cardContainer.classList.add('notSupported');
+            if (script.mobile) {
+                cardName.textContent += " 📱";
+                if (isMobile()) {
+                    cardContainer.classList.remove('notSupported');
+                }
             }
-        }
-        
-        if (script.desktop) {
-            cardName.textContent += " 🖥️";
-            if (!isMobile()) {
-                cardContainer.classList.remove('notSupported');
+            
+            if (script.desktop) {
+                cardName.textContent += " 🖥️";
+                if (!isMobile()) {
+                    cardContainer.classList.remove('notSupported');
+                }
             }
         }
 
-        if (script.wip) {
+        // Some scripts currently dont work in chrome
+        const chromeSupport = browserType === "chrome" && script.chrome === false ? false : true;
+
+        if (chromeSupport === false) {
+            cardName.textContent += " Only firefox";
+            cardContainer.classList.add('notSupported');
+            
+        } else if (script.wip) {
             cardContainer.classList.add('featureWIP')
         }
 
@@ -82,8 +146,14 @@ function createScriptsPage(contentScripts) {
         buttonsContainer.classList.add('option-card-buttonContainer');
 
         // User is not meant to close them.
-        if (!scriptName.startsWith('helper-')) {
-            buttonsContainer.appendChild(createSwitchElement(script.enabled, scriptName));
+        if (!cardContainer.classList.contains('notSupported')) {
+            if (!scriptName.startsWith('helper/')) {
+                toggleScript(cardContainer, script.enabled, scriptName);
+            } else {
+                cardContainer.classList.toggle('option-card-enabled');
+                cardContainer.style.setProperty('background-color', '#a1f2fb', 'important');
+                cardContainer.style.setProperty('cursor', 'default', 'important');
+            }
         }
 
         cardTop.appendChild(buttonsContainer);
@@ -99,25 +169,17 @@ function createScriptsPage(contentScripts) {
             cardSettings.classList.add('card-settings');
 
             cardSettings.addEventListener("click", function() {
-                document.getElementById("overlay-header-scriptname").textContent = script.formattedName;
-                overlay.style.display = "flex";
+                document.getElementById('featuresEditPage').scrollIntoView({ behavior: 'smooth' });
 
-                document.getElementById('overlay-content-dataName').textContent = script.changeableData;
+                let data = localStorageData[script.changeableData];
+                const jsonEditor = document.getElementById('featuresEditor');
 
-
-                const textarea = document.getElementById('overlay-content-cards-textarea');
-
-                const data = localStorageData[script.changeableData];
-
-                if (Array.isArray(data)) {
-                    textarea.setAttribute('dataType', 'array');
-                    textarea.value = data.join('\n');
-                } else if (typeof data === 'object') {
-                    textarea.setAttribute('dataType', 'object');
-                    textarea.value = JSON.stringify(data, null, 2);
+                if (typeof data !== "object") {
+                    jsonEditor.dataset.key = "";
+                    setJsonEditor({ [script.changeableData]: data });
                 } else {
-                    textarea.setAttribute('dataType', 'int');
-                    textarea.value = data;
+                    jsonEditor.dataset.key = [script.changeableData];
+                    setJsonEditor(data);
                 }
             });
 
@@ -132,20 +194,30 @@ function createScriptsPage(contentScripts) {
             const card = e.target.closest('.option-card');
         
             if (card) {
-
                 const isChild = e.target.closest('.option-card-buttonContainer');
                 if (isChild) {
                     cardTooltip.style.visibility = 'hidden';
                     return;
                 }
-
+        
                 const tooltipText = script.description;
                 cardTooltip.textContent = tooltipText;
-            
-                const tooltipHeight = cardTooltip.offsetHeight;      
-            
-                cardTooltip.style.left = e.pageX + 'px'; 
-                cardTooltip.style.top = (e.pageY - tooltipHeight) + 'px'; 
+        
+                const tooltipHeight = cardTooltip.offsetHeight;
+                const tooltipWidth = cardTooltip.offsetWidth;
+        
+                let leftPosition = e.pageX;
+        
+                if (leftPosition + tooltipWidth > window.innerWidth) {
+                    leftPosition = e.pageX - tooltipWidth; 
+                }
+        
+                if (leftPosition < 0) {
+                    leftPosition = e.pageX;
+                }
+        
+                cardTooltip.style.left = leftPosition + 'px';
+                cardTooltip.style.top = (e.pageY - tooltipHeight) + 'px';
                 cardTooltip.style.visibility = 'visible';
             } else {
                 cardTooltip.style.visibility = 'hidden';
@@ -162,48 +234,12 @@ function createScriptsPage(contentScripts) {
     }
 }
 
-const localStorageData = {};
+let localStorageData = {};
 
-for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = JSON.parse(localStorage.getItem(key));
-    localStorageData[key] = value;
-}
+browser.storage.local.get(null, (result) => {
+    localStorageData = result;
 
-createScriptsPage(localStorageData.contentScripts);
-
-// Overlay
-
-const overlay = document.getElementById('overlay');
-document.getElementById('overlay-close').addEventListener("click", function() {
-    overlay.style.display = "none";
-
-    const dataName = document.getElementById('overlay-content-dataName').textContent;
-    const textarea = document.getElementById('overlay-content-cards-textarea');
-    const dataType = textarea.getAttribute('dataType');
-    const textareaContent = textarea.value;
-
-    if (dataType === 'array') {
-        const cardsArray = textareaContent.split('\n');
-        localStorageData[dataName] = cardsArray;
-        localStorage.setItem(dataName, JSON.stringify(localStorageData[dataName]));
-
-    } else if (dataType === 'int') {
-        const intValue = parseInt(textareaContent, 10);
-
-        if (intValue > 0) {
-            localStorageData[dataName] = intValue;
-            localStorage.setItem(dataName, JSON.stringify(localStorageData[dataName]));
-        }
-    } else if (dataType === "object") {
-        try {
-            const jsonObject = JSON.parse(textareaContent);
-            localStorageData[dataName] = jsonObject;
-            localStorage.setItem(dataName, JSON.stringify(localStorageData[dataName]));
-        } catch (e) {
-            console.error("Invalid JSON data:", e);
-        }
-    }
+    createScriptsPage(localStorageData.contentScripts);
 });
 
 
@@ -224,13 +260,24 @@ document.getElementById('exportBtn').addEventListener("click", function() {
 });
 
 function exportSettings() {
+    const exportData = { ...localStorageData };
+  
+    delete exportData["stats-manga"];
+    delete exportData["stats-anime"];
 
+    const modifiedContentScripts = {};
+    for (const script in exportData.contentScripts) {
+        if (exportData.contentScripts.hasOwnProperty(script)) {
+            modifiedContentScripts[script] = { enabled: exportData.contentScripts[script].enabled };
+        }
+    }
+    exportData.contentScripts = modifiedContentScripts;
 
-    const blob = new Blob([JSON.stringify(localStorageData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.download = 'animeplanet-additions-export.json';
+    const link = document.createElement("a");
+    link.download = "animeplanet-additions-export.json";
     link.href = url;
 
     document.body.appendChild(link);
@@ -269,19 +316,53 @@ document.getElementById('fileInput').addEventListener("change", function(event) 
 
 function importSettings(content) {
     try {
-        for (let key in content) {
-            if (content.hasOwnProperty(key)) {
-                if (localStorageData.hasOwnProperty(key)) {
-                    localStorageData[key] = content[key];
-                    localStorage.setItem(key, JSON.stringify(content[key]));
-                }
+      for (let key in content) {
+        if (content.hasOwnProperty(key)) {
+            if (key === "contentScripts" && localStorageData.hasOwnProperty("contentScripts")) {
+                browser.storage.local.get(["contentScripts"], (result) => {
+                    for (let script in content.contentScripts) {
+                        if (content.contentScripts.hasOwnProperty(script) && localStorageData.contentScripts.hasOwnProperty(script)) {
+                            localStorageData.contentScripts[script].enabled = content.contentScripts[script].enabled;
+                        }
+                    }
+                    browser.storage.local.set({ "contentScripts": localStorageData.contentScripts });
+                });
+            } else if (localStorageData.hasOwnProperty(key)) {
+                localStorageData[key] = content[key];
+                browser.storage.local.set({ [key]: content[key] });
             }
         }
-
-        console.log("Settings imported successfully", localStorageData);
-        alert("Settings imported successfully");
+      }
+  
+      console.log("Settings imported successfully", localStorageData);
+      alert("Settings imported successfully");
+      location.reload();
     } catch (err) {
-        console.log("Encountered an error while trying to import settings", err);
-        alert("Encountered an error while trying to import settings");
+      console.log("Encountered an error while trying to import settings", err);
+      alert("Encountered an error while trying to import settings");
+    }
+}
+
+// Reset localstorage
+
+document.getElementById('resetBtn').addEventListener("click", async function() {
+
+    if (!confirm("Are you sure you want to reset the settings?")) return;
+    let reseted = await resetLocalStorage();
+
+    if (reseted) {
+        location.reload();
+    } else {
+        alert("Was unable to reset settings.")
+    }
+});
+
+async function resetLocalStorage() {
+    try {
+        let response = await browser.runtime.sendMessage("resetLocalStorage");
+        return response === true;
+    } catch (error) {
+        console.error("Error resetting local storage:", error);
+        return false;
     }
 }

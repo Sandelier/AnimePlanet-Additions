@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Animeplanet Additions",
+  "version": "2.0.0",
+  "description": "Extension to add features and fixing inconveniences I have had with Anime-Planet.",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "webNavigation",
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "https://www.anime-planet.com/*"
+  ],
+
+  "optional_host_permissions": ["https://api.mangaupdates.com/"],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}

@@ -3,7 +3,7 @@ let touchStartY = 0;
 let touchEndY = 0;
 
 document.addEventListener('wheel', (event) => {
-    handleScroll(event.deltaY);
+    handleScroll(event.deltaY, event);
 });
 
 document.addEventListener('touchstart', (event) => {
@@ -14,9 +14,9 @@ document.addEventListener('touchmove', (event) => {
     touchEndY = event.touches[0].clientY;
 });
 
-document.addEventListener('touchend', () => {
+document.addEventListener('touchend', (event) => {
     const deltaY = touchStartY - touchEndY;
-    handleScroll(deltaY);
+    handleScroll(deltaY, event);
 });
 
 function isMobile() {
@@ -40,36 +40,76 @@ const visualizerMain = document.getElementById('visualizerMain');
 const homePage = document.getElementById('homePage');
 const visualizerStats = document.getElementById('visualizerStats');
 const visualizerStart = document.getElementById('visualizerStart');
+const featuresEditPage = document.getElementById('featuresEditPage');
 homePage.scrollIntoView();
 
-window.addEventListener('resize', (event) => {
+window.addEventListener('resize', () => {
     if (!isMobile()) {
         homePage.scrollIntoView();
     }
 });
-function handleScroll(deltaY) {
-    const scriptsContainer = document.getElementById('scripts-container');
-    if (scriptsContainer.contains(event.target) && scriptsContainer != event.target) {
+function handleScroll(deltaY, event) {
+
+
+    const visualizerTopBottom = document.getElementById('visualizerStats-topBottom');
+    const isVisualizerOverflowing = visualizerTopBottom.scrollHeight > visualizerTopBottom.clientHeight;
+    if (isVisualizerOverflowing && visualizerTopBottom.contains(event.target)) {
+        const atTopScrollingUp = deltaY < 0 && visualizerTopBottom.scrollTop === 0;
+
+        if (!atTopScrollingUp) {
+            return;
+        }
+    }
+
+    const featuresEditor = document.getElementById('featuresEditor');
+    const isfeaturesEditorOverflowing = featuresEditor.scrollHeight > featuresEditor.clientHeight;
+    if (isfeaturesEditorOverflowing && featuresEditor.contains(event.target)) {
         return;
     }
 
-    // Gonna rethink the logic later so for now its this quick and bad code :p
+    const scriptsContainer = document.getElementById('scripts-container');
+    const isOverflowing = scriptsContainer.scrollHeight > scriptsContainer.clientHeight;
+    if (!isOverflowing && scriptsContainer.contains(event.target) && scriptsContainer != event.target) {
+        return;
+    }
+
+    if (isOverflowing && scriptsContainer.contains(event.target)) {
+        const atTopScrollingUp = deltaY < 0 && scriptsContainer.scrollTop === 0;
+        const atBottomScrollingDown = deltaY > 0 && scriptsContainer.scrollTop + scriptsContainer.clientHeight >= scriptsContainer.scrollHeight;
+
+        if (!atTopScrollingUp && !atBottomScrollingDown) {
+            return;
+        }
+    }
+
+    const scriptsRect = scriptsPage.getBoundingClientRect();
+    const featuresEditRect = featuresEditPage.getBoundingClientRect();
+    const visualizerMainRect = visualizerMain.getBoundingClientRect();
+    const visualizerStartRect = visualizerStart.getBoundingClientRect();
+    const visualizerStatsRect = visualizerStats.getBoundingClientRect();
 
     if (deltaY > 0) {
-        if (homePage.getBoundingClientRect().top === 0) {
+        if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
             scriptsPage.scrollIntoView({ behavior: 'smooth' });
-        } else if (scriptsPage.getBoundingClientRect().top === 0) {
+        } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
+            visualizerMain.scrollIntoView({ behavior: 'smooth' });
+        } else if (homePage.getBoundingClientRect().top === 0) {
+            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+        } else if (scriptsRect.top === 0) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
         }
     } else {
-        if (!isMobile() && visualizerStart.getBoundingClientRect().x <= (window.innerWidth/1.5)) {
-            visualizerMain.scrollIntoView({ behavior: 'smooth' });
-        } else if (visualizerMain.getBoundingClientRect().top === 0) {
+
+        if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
             scriptsPage.scrollIntoView({ behavior: 'smooth' });
-        } else if (scriptsPage.getBoundingClientRect().top === 0) {
-            homePage.scrollIntoView({ behavior: 'smooth' });
-        } else if (!isMobile() &&visualizerStats.getBoundingClientRect().top === 0) {
+        } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
             visualizerMain.scrollIntoView({ behavior: 'smooth' });
+        } else if (visualizerStatsRect.top === 0) {
+            visualizerMain.scrollIntoView({ behavior: 'smooth' });
+        } else if (visualizerMainRect.top === 0) {
+            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+        } else if (scriptsRect.top === 0) {
+            homePage.scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
@@ -86,12 +126,3 @@ visualizerBtn.addEventListener('click', (event) => {
         visualizerPage.scrollIntoView({ behavior: 'smooth' });
     }
 });
-
-
-if (isMobile()) {
-    document.getElementById('visualizerPage').remove();
-    visualizerBtn.classList.add('deactivatedBtn');
-    visualizerStats.remove();
-    visualizerStart.remove();
-    visualizerMain.remove();
-}

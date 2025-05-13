@@ -57,7 +57,8 @@ body {
 
 #homePage > h1,
 #visualizerMain > h1,
-#featuresContainer > h1 {
+#featuresContainer > h1,
+#featuresEditPage > h1 {
     font-size: 4rem;
     font-family: "Allan", cursive;
     font-weight: 400;
@@ -71,13 +72,22 @@ body {
 #visualizerMain > p,
 #visualizerStart > p {
     padding: 0;
-    margin: 0;
+    margin: 0px 20px;
     margin-bottom: 24px;
     text-align: center;
     font-size: 18px;
     color: rgb(60, 58, 70);
     font-weight: 500;
     font-family: "Roboto", sans-serif;
+}
+
+@media (max-width: 836px) {
+    #homePage > div {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        width: 100%;
+    }
 }
 
 .defaultBtnStyle {
@@ -168,6 +178,13 @@ body {
   padding: 10px;
   border: solid 1px black;
   transition: 0.3s;
+  cursor: pointer;
+}
+
+.option-card-enabled {
+  background-color: #f2ebeb !important;
+  color: black !important;
+  border: 1px solid rgb(35, 38, 59) !important;
 }
 
 .option-card:not(.notSupported):hover {
@@ -200,6 +217,8 @@ body {
 
 .option-card-top > label {
   user-select: none;
+  font-family: serif;
+  font-size: 16px;
 }
 
 .option-card-top > div {
@@ -212,7 +231,7 @@ body {
     gap: 20px;
     width: calc(200px + 55%);
     overflow-y: scroll;
-    max-height: calc(90% - 15px) !important;
+    max-height: calc(80% - 15px) !important;
     justify-content: center;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -224,6 +243,25 @@ body {
     background: transparent; 
     width: 0px;
 }
+
+@media (max-width: 1710px) {
+  #scripts-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  #scripts-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  #scripts-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 
 
 /* Switch buttons */
@@ -308,10 +346,11 @@ input:checked + .slider:before {
 }
 
 .card-settings:hover {
-    transform: scale(1.2);
+  transform: scale(1.2);
 }
 
-.option-card:hover .card-settings {
+
+.option-card:not(.option-card-enabled):hover .card-settings {
   filter: invert();
 }
 

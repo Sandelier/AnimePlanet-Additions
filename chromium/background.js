@@ -1,4 +1,8 @@
 
+import './ini.js';
+import { getMangaInfo } from './moduleScripts/contentScripts/Mangaupdates/searchManga.js';
+import { startScraping } from './moduleScripts/StatsScraper/scrapingMain.js';
+import { changeToPcMode } from "./moduleScripts/PC-mode/toPc.js";
 
 
 var browser = browser || chrome;
@@ -225,7 +229,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (message.value) {
                 (async () => {
                     try {
-                        const { getMangaInfo } = await import("./moduleScripts/contentScripts/Mangaupdates/searchManga.js");
                         const mangaInfo = await getMangaInfo(message.value);
                         sendResponse({ value: mangaInfo });
                     } catch (error) {
@@ -238,27 +241,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
             break;
         case 'scrapeUser':
-            (async () => {
-                try {
-                    const { startScraping } = await import("./moduleScripts/StatsScraper/scrapingMain.js");
-                    startScraping(message.value);
-                } catch (error) {
-                    console.error('Error loading scraper module:', error);
-                }
-            })();
-
+            startScraping(message.value);
             break;
         case 'PCMode':
-
-            (async () => {
-                try {
-                    const { changeToPcMode } = await import("./moduleScripts/PC-mode/toPc.js");
-                    changeToPcMode(message.value);
-                } catch (error) {
-                    console.error('Error loading scraper module:', error);
-                }
-            })();
-            break;
+            changeToPcMode(message.value);
         default:
             console.warn('Unknown action:', message.action);
             break;

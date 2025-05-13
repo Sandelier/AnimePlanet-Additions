@@ -62,8 +62,42 @@ function createCanvas(width, height, toAppend) {
     return canvas;
 }
 
+function getDivisors(number) {
+    const divisors = [];
+    for (let i = 1; i <= number; i++) {
+        if (number % i === 0) {
+            divisors.push(i);
+        }
+    }
+    return divisors;
+}
+  
+function findBestDivisor(chapterCount, progressBarTotalWidth) {
+    const divisors = getDivisors(roundNumber(chapterCount));
+    let bestDivisor = null;
+    let closestDifference = Infinity;   
+    divisors.forEach(divisor => {
+        const quotient = progressBarTotalWidth / divisor;
+        const difference = Math.abs(quotient - 60);   
+        if (difference < closestDifference || (difference === closestDifference && divisor < bestDivisor)) {
+            closestDifference = difference;
+            bestDivisor = divisor;
+        }
+    }); 
+
+    return bestDivisor;
+}
+
 function makeInstallmentImage(statsData, toAppend) {
-    const canvasWidth = 850;
+
+    let canvasWidth = 850;
+    let progressBarTotalWidth = 600;
+
+    if (window.innerWidth < 1600) {
+        canvasWidth = window.innerWidth;
+        progressBarTotalWidth = Math.round(canvasWidth * 0.7058823529411765);
+    }
+
     const canvasHeight = 170;
     const canvas = createCanvas(canvasWidth, canvasHeight, toAppend);
     canvas.style.height = `${canvasHeight}px`;
@@ -77,7 +111,6 @@ function makeInstallmentImage(statsData, toAppend) {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // progress bar
-    const progressBarTotalWidth = 600;
     const progressBarHeight = 16;
     const chapterPercentage = statsData.chapterCount / roundNumber(statsData.chapterCount);
     const progressWidth = progressBarTotalWidth * chapterPercentage;
@@ -99,8 +132,8 @@ function makeInstallmentImage(statsData, toAppend) {
     ctx.roundRect(progressBarX, progressBarY, progressWidth, progressBarHeight, [roundness, roundness, roundness, roundness]);
     ctx.fill();
 
-    // Drawing the ticks on the progress bar
-    const ticksArray = generateTicks(10, roundNumber(statsData.chapterCount));
+    // Drawing the ticks on the progress bar  
+    const ticksArray = generateTicks(findBestDivisor(statsData.chapterCount, progressBarTotalWidth), roundNumber(statsData.chapterCount));
     const tickLocY = progressBarY + progressBarHeight + 25;
 
     ticksArray.forEach(tick => {
@@ -108,7 +141,11 @@ function makeInstallmentImage(statsData, toAppend) {
         const percentage = (tick / roundNumber(statsData.chapterCount)) * 100;
         let tickText = tick.toString();
         if (tick >= 1000 && tick < 1000000) {
-            tickText = (tick / 1000).toFixed(0) + 'k';
+            let formatted = (tick / 1000).toFixed(1);
+            if (formatted.endsWith('.0')) {
+                formatted = formatted.slice(0, -2);
+            }
+            tickText = formatted + 'k';
         } else if (tick >= 1000000) {
             tickText = (tick / 1000000).toFixed(0) + 'm';
         }
@@ -129,14 +166,16 @@ function makeInstallmentImage(statsData, toAppend) {
         ctx.stroke();
     });
 
-    // Estimated time.
-    const estText = `est. ${calcEstimatedTime(statsData.chapterCount, statsData.averageChaptersPerDay, roundNumber(statsData.chapterCount))}`;
-    const estTextX = (progressBarTotalWidth + canvasWidth) / 2 + 25;
-    const estTextY = progressBarY + progressBarHeight - 4;
+    if (window.innerWidth >= 1600) {
+        // Estimated time.
+        const estText = `est. ${calcEstimatedTime(statsData.chapterCount, statsData.averageChaptersPerDay, roundNumber(statsData.chapterCount))}`;
+        const estTextX = (progressBarTotalWidth + canvasWidth) / 2 + 25;
+        const estTextY = progressBarY + progressBarHeight - 4;
 
-    ctx.fillStyle = 'black';
-    ctx.font = '15px Mulish';
-    ctx.fillText(estText, estTextX, estTextY);
+        ctx.fillStyle = 'black';
+        ctx.font = '15px Mulish';
+        ctx.fillText(estText, estTextX, estTextY);
+    }
 
     // Top text
     let topText = 'Chapters Read';
@@ -173,7 +212,14 @@ function makeDoughnutChart(statsData, toAppend, legendPosition) {
     const total = data.reduce((acc, val) => acc + val, 0);
     const labels = statsData.labels.map((label, index) => `${label} (${data[index]})`);
 
-    const canvas = createCanvas(510, 246, toAppend);
+
+    let canvas;
+
+    if (window.innerWidth < 1600) {
+        canvas = createCanvas(window.innerWidth, window.innerWidth/2, toAppend);
+    } else {
+        canvas = createCanvas(510, 246, toAppend);
+    }
     const ctx = canvas.getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',

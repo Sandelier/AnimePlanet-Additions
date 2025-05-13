@@ -4,21 +4,27 @@
   {
     "manifest_version": 3,
     "name": "Animeplanet Additions",
-    "version": "1.0.5",
+    "version": "2.0.0",
     "description": "Extension to add features and fixing inconveniences i have had with animeplanet.",
     "permissions": [
       "tabs",
       "scripting",
-      "webNavigation"
+      "webNavigation",
+      "storage"
     ],
+
+    "optional_permissions": [
+      "webRequest",
+      "webRequestBlocking",
+      "https://api.mangaupdates.com/*"
+    ],
+
     "background": {
-      "scripts": ["background.js"]
+      "scripts": ["ini.js", "background.js"]
     },
 
     "host_permissions": [
-      "https://www.anime-planet.com/*",
-      "https://api.mangaupdates.com/v1/series/*"
-
+      "https://www.anime-planet.com/*"
     ],
 
     "action": {
@@ -41,7 +47,7 @@
         "strict_min_version": "126.0"
       },
       "gecko_android": {
-        "strict_min_version": "131.0.3"
+        "strict_min_version": "131.0"
       }
     }
 }

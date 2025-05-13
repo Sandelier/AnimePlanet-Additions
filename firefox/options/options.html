@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AP-Additions - Options</title>
 
-    <link rel="stylesheet" href="styles/overlay.css">
+    <link rel="stylesheet" href="styles/featuresEdit.css">
     <link rel="stylesheet" href="styles/styles.css">
     
     <script src="stylingScript.js" defer></script>
     <script src="script.js" defer></script>
+    <script src="featuresEdit.js" defer></script>
     <script src="visualizer/visualizer-main.js" defer></script>
     <script src="visualizer/visualizer-stats.js" defer></script>
 
@@ -26,6 +27,7 @@
                 <button id="exportBtn" class="defaultBtnStyle"><span>Export</span></button>
                 <input type="file" id="fileInput" accept=".json" style="display:none"/>
 
+                <button id="resetBtn" class="defaultBtnStyle"><span>Reset</span></button>
                 <button id="featuresBtn" class="defaultBtnStyle"><span>Features</span></button>
                 <button id="visualizerBtn" class="defaultBtnStyle"><span>Visualizer</span></button>
 
@@ -41,7 +43,11 @@
                 <div id="scripts-container"></div>
                 <div id="card-tooltip"></div>
             </div>
-            <div class="spaceWaster"></div>
+            <div id="featuresEditPage">
+                <h1>Feature settings</h1>
+                <button id="feature-saveBtn" class="defaultBtnStyle"><span>Save</span></button>
+                <div id="featuresEditor"></div>
+            </div>
         </div>
 
         <div id="visualizerPage">
@@ -82,21 +88,6 @@
             <div id="visualizerStats-topBottom"></div>
             <div id="visualizerStats-bottom"></div>
             <div class="spaceWaster"></div>
-        </div>
-    </div>
-    
-    <div id="overlay">
-        <div id="overlay-container">
-            <div id="overlay-header">
-                <p id="overlay-header-scriptname"></p>
-                <button id="overlay-close">x</button>
-            </div>
-            <div id="overlay-content">
-                <p id="overlay-content-dataName"></p>
-                <div id="overlay-content-cards">
-                    <textarea id="overlay-content-cards-textarea"></textarea>
-                </div>
-            </div>
         </div>
     </div>
 </body>
