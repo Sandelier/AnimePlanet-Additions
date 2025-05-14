@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Animeplanet Additions",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Extension to add features and fixing inconveniences I have had with Anime-Planet.",
   "permissions": [
     "tabs",
@@ -23,6 +23,14 @@
   "action": {
     "default_popup": "popup/popup.html"
   },
+
+  "web_accessible_resources": [
+      {
+        "resources": ["images/mangaupdates_modified.svg"],
+        "matches": ["<all_urls>"]
+      }
+  ],
+
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true

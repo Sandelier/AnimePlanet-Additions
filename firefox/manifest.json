@@ -4,7 +4,7 @@
   {
     "manifest_version": 3,
     "name": "Animeplanet Additions",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Extension to add features and fixing inconveniences i have had with animeplanet.",
     "permissions": [
       "tabs",
@@ -40,6 +40,13 @@
     "icons": {
       "128": "icon.svg"
     },
+
+    "web_accessible_resources": [
+      {
+        "resources": ["images/mangaupdates_modified.svg"],
+        "matches": ["<all_urls>"]
+      }
+    ],
 
     "browser_specific_settings": {
       "gecko": {

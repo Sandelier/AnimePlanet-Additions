@@ -4,6 +4,17 @@
 
 	document.dispatchEvent(new CustomEvent("injectedScript", { detail: { name: "entry/getMangaupdatesData.js" } }));
 
+	// Blocks if its not in the manga overview page + if its an novel
+	const novelTags = ["Light Novels", "Web Novels", "Korean Novels", "Novels", "Chinese Novels"];
+	const tagElements = document.querySelectorAll("section#entry.pure-g.EntryPage__content div.tags li");
+	
+	const isNovel = Array.from(tagElements).some(tag =>
+		novelTags.includes(tag.textContent.trim())
+	);
+
+	if (!document.querySelector('div#siteContainer section.pure-g.entryBar') || isNovel) {
+    	return;
+	}
 
 	async function callRequestFromLocal(action, type, value) {
         const requestId = Math.random().toString(36).substr(2, 9);
@@ -30,25 +41,25 @@
 	if (mangaNameElement) {
 		const mangaName = mangaNameElement.textContent.trim();
 
-		function getMangaInfo(name) {
-			(async () => {
-				try {
-					const response = await callRequestFromLocal('getMangaInfo', '', name);
-					if (response && response.value) {
-						try {
-							handleResponse(JSON.parse(response.value));
-						} catch (error) {
-							console.log("Failed to parse response value:", error);
-						}
-					} else {
-						console.log('Failed to retrieve manga info');
+		async function getMangaInfo(name) {
+			try {
+				const response = await callRequestFromLocal('getMangaInfo', '', name);
+				if (response && response.value) {
+					try {
+						handleResponse(JSON.parse(response.value));
+						return true;
+					} catch (error) {
+						console.log("Failed to parse response value:", error);
+						return false;
 					}
-				} catch (error) {
-					console.error('Error fetching manga info:', error);
+				} else {
+					console.log('Failed to retrieve manga info');
+					return false;
 				}
-			})();
-
-			
+			} catch (error) {
+				console.error('Error fetching manga info:', error);
+				return false;
+			}
 		}
 
 		function handleResponse(mangaInfo) {
@@ -56,10 +67,9 @@
 			if (mangaInfo && mangaInfo.status) {
 				switch (mangaInfo.status) {
 					case "ok":
+						getDataBtn.textContent = "Update data";	
 
-						main(mangaInfo.data.associated, mangaInfo.data.description, mangaInfo.data.publications, mangaInfo.data.year, true);
-
-						getDataBtn.remove();
+						main(mangaInfo.data.associated, mangaInfo.data.status, mangaInfo.data.url, mangaInfo.data.description, mangaInfo.data.publications, mangaInfo.data.year, true);
 						break;
 					case "rateLimit":
 						console.log('Rate limit reached. Please wait before retrying.');
@@ -96,7 +106,7 @@
 			for (let j = 0; j <= b.length; j++) {
 			  tmp[0][j] = j;
 			}
-			
+
 			for (let i = 1; i <= a.length; i++) {
 			  for (let j = 1; j <= b.length; j++) {
 				const cost = a[i - 1] === b[j - 1] ? 0 : 1;
@@ -117,32 +127,37 @@
 		const mangaMagazine = document.querySelector('div.md-1-5:nth-child(2) > a');
 		const mangaYear = document.querySelector('div.md-1-5:nth-child(3) > span');
 
-		function main(mangaOtherNames, mangaDesc, mangaPublications, mangaStartYear, saveToEntries = false) {
+		function main(mangaOtherNames, status, muLink, mangaDesc, mangaPublications, mangaStartYear, saveToEntries = false) {
 
-			let entryJson = { MU: {} };
+			status = status.replace(/[*•]/g, '');
 
+			let entryJson = { MU: {
+				"url": muLink,
+				"status": status
+			}};
 			mangaDesc = decodeHTMLEntities(mangaDesc);
 
 			// Many contain like "From Square Enix:" or something similar at the start
 			mangaDesc = mangaDesc.replace(/^From\s[^:]+:/, "");
 			mangaDesc = mangaDesc.replace(/^\(From \[.*?:/, "");
 
+			// Asterick removing (bold text)
+			mangaDesc = mangaDesc.replace(/\*{2,}/g, "");
+
 			// The ending of description typically contains like orginal translation links and etc or official links
-			mangaDesc = mangaDesc.replace(/\*\*(Original|Official|Links)[\s\S]*/, "");
-			mangaDesc = mangaDesc.replace(/[(Original|Official|Links)[\s\S]*/, "");
+			mangaDesc = mangaDesc.replace(/(.)?(Original|Official|Links)[\s\S]*/, "");
 
 			// Removing all <br> texts and then splitting it when we encounter an <b> or <a>
 			mangaDesc = mangaDesc.replace(/<BR><BR>/g, " ");
 			mangaDesc = mangaDesc.replace(/<BR>/g, "");
 			mangaDesc = mangaDesc.split(/<b>|<a|<!/)[0];
-			
 
 			if (mangaOtherNames.length > 0) {
 				addToAltTitles(mangaOtherNames);
 				entryJson.MU.mangaOtherNames = mangaOtherNames.map(obj => obj.title);
 			}
 
-			if (mangaDesc && mangaDesc != "undefined") {
+			if (mangaDesc && mangaDesc != undefined && mangaDesc != "undefined") {
 				if (!mangaDescriptionElement) {
 					createDescription(mangaDesc, false);
 					entryJson.MU.mangaDesc = mangaDesc;
@@ -175,7 +190,78 @@
 
 			}
 
-			style.remove();
+			// Mu link to notes
+			if (muLink) {
+
+				const dataContainer = document.querySelector('section#entry.pure-g.EntryPage__content div.pure-1.md-2-3 div.pure-1.md-3-5');
+
+				const synopsisEles = dataContainer.querySelectorAll('.synopsisManga');
+				const lastSynopsisEle = synopsisEles[synopsisEles.length - 1];
+
+				// creating notes div if it dosent exist.
+				let notesDiv = dataContainer.querySelector('div.notes');
+				if (!notesDiv) {
+				  notesDiv = document.createElement('div');
+				  notesDiv.className = 'notes';
+
+				  lastSynopsisEle.parentNode.insertBefore(notesDiv, lastSynopsisEle.nextSibling);
+				}
+
+				// mu link
+				let linkEle = document.createElement('a');
+				linkEle.href = muLink;
+				linkEle.target = '_blank';
+				linkEle.className = 'mangaupdates-link';
+
+				// mu logo
+				let muLogo = document.createElement('img');
+				muLogo.src = chrome.runtime.getURL('images/mangaupdates_modified.svg');
+
+				linkEle.appendChild(muLogo);
+				linkEle.appendChild(document.createTextNode('Mangaupdates'));
+
+				notesDiv.appendChild(linkEle);
+			}
+
+			if (status) {
+				const container = document.querySelector('section#entry.pure-g.EntryPage__content div.pure-1.md-1-3');
+
+				// Heard that this element was used for ads but is nowadays not used anymore so we are hiding it.
+				container.querySelector('div.gah').style.display = "none";
+
+				const newSection = document.createElement('section');
+				newSection.classList.add('MuStatus');
+			
+				const heading = document.createElement('h3');
+				heading.textContent = 'MU Status';
+				newSection.appendChild(heading);
+
+				// Adding data to the section
+
+				function appendMatchSpan(regex, prefix, source = status) {
+					const match = source.match(regex);
+					if (match) {
+						const span = document.createElement('span');
+						span.textContent = `${prefix}${match[1]}`;
+						newSection.appendChild(span);
+					}
+				}
+
+				// Volumes
+				appendMatchSpan(/(\d+)\s*Volumes?/, 'Volumes: ', status);
+
+				// Chapters has to also check for dots since sometimes its like "403.2 Chapters"
+				appendMatchSpan(/(\d+(?:\.\d+)?)\s*Chapters?/, 'Chapters: ', status);
+
+				// Manga status
+				appendMatchSpan(/\((.*?)\)/, '• Status: ');
+
+				// Season status (check last line only)
+				const lastLine = status.split('\n').pop();
+				appendMatchSpan(/(TBA)$/, '• Season Status: ', lastLine);
+			
+				container.appendChild(newSection);
+			}
 		}
 
 		// Entry bar.
@@ -217,6 +303,7 @@
 		function createToggleButton(container, divSynopsis) {
 		    const toggleButton = document.createElement('button');
 		    toggleButton.textContent = 'MU Synopsis';
+			toggleButton.style.margin = "1.33em 0 0em";
 		
 		    const tagsElement = container.querySelector('div.tags');
 		    if (tagsElement) {
@@ -247,7 +334,7 @@
 				altTitles.appendChild(altTitlesTextNode);
 			} 
 
-			
+
 			if (otherNames.length >= 3) {
 				altTitles.textContent = altTitles.textContent.replace('Alt title:', 'Alt titles:');
 			}
@@ -266,7 +353,7 @@
 			if (otherNames.length > 0) {
 				const newTitles = otherNames.map(nameObj => nameObj.title.trim()).join(', ');
 				let trimmedText = altTitles.textContent.trim();
-						
+
 				if (trimmedText.includes(":") && !trimmedText.includes(": ")) {
 					trimmedText = trimmedText.replace(":", ": ");
 				}
@@ -283,12 +370,39 @@
 		const style = document.createElement('style');
 
 		style.textContent = `
-          @media (min-width: 48em) {
-            .md-1-5 {
-              width: 16% !important;
-            }
-          }
-        `;
+			@media (min-width: 48em) {
+				.md-1-5 {
+					width: 16% !important;
+				}
+			}
+
+			#entry.pure-g.EntryPage__content .pure-1.md-1-3:has(section.MuStatus) {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-evenly;
+			}
+
+			@media (min-width: 768px) {
+				.MuStatus {
+					margin-bottom: 1.4em;
+					padding-left: 1em;
+				}
+			}
+			
+			.MuStatus > span {
+				display: block;
+				margin-bottom: 5px;
+			}
+			
+			.mangaupdates-link {
+				display: flex;
+				align-items: center;
+			}
+			.mangaupdates-link img {
+				max-height: 16px;
+				margin-right: 5px;
+			}
+		`;
 
 		document.head.appendChild(style);
 
@@ -311,31 +425,31 @@
 			const response = await callRequestFromLocal('getLocalStorageValue', 'entries');
 			const entries = response.value;
 
-			if (entries[entryType]?.[entryId]?.MU === undefined) {
-				// Button creation
-				getDataBtn.classList.add('pure-1', 'md-1-5');
-				getDataBtn.textContent = 'Fetch Data';
-		
-				getDataBtn.addEventListener('click', function () {
-					getDataBtn.disabled = true;
-					getDataBtn.style.cursor = 'not-allowed';
-		
-					setTimeout(function () {
-						getDataBtn.disabled = false;
-						getDataBtn.style.cursor = 'pointer';
-					}, 10000);
-		
-					getMangaInfo(mangaName);
-				});
-		
-				const entryBar = document.querySelector('section.pure-g.entryBar');
-				entryBar.appendChild(getDataBtn);
-			} else {
+
+
+			getDataBtn.classList.add('pure-1', 'md-1-5');
+			const entryBar = document.querySelector('section.pure-g.entryBar');
+			entryBar.appendChild(getDataBtn);
+
+			// fetch button
+			getDataBtn.textContent = 'Fetch Data';
+			getDataBtn.addEventListener('click', async () => {
+				getDataBtn.disabled = true;
+				getDataBtn.style.cursor = 'not-allowed';
+
+				await getMangaInfo(mangaName);
+
+				getDataBtn.disabled = false;
+				getDataBtn.style.cursor = 'pointer';
+			});
+
+			// Show data
+			if (entries[entryType]?.[entryId]?.MU) {
+				getDataBtn.textContent = "Update data";
+
 				const muData = entries[entryType][entryId].MU;
-
 				muData.mangaOtherNames = (muData.mangaOtherNames ?? []).map(title => ({ title }));
-
-    			main( muData.mangaOtherNames, muData.mangaDesc, muData.mangaPublications, muData.mangaStartYear );
+				main(muData.mangaOtherNames, muData?.status, muData?.url, muData.mangaDesc, muData.mangaPublications, muData.mangaStartYear);
 			}
 		})();
 	}

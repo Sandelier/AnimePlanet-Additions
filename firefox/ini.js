@@ -198,7 +198,7 @@ browser.runtime.onInstalled.addListener(() => {
                 enabled: false,
                 description: "Adds an button to fetch mangaupdate's data and add it to the manga page.",
                 allowedUrls: [
-                    "https://www.anime-planet.com/manga/"
+                    "^https:\/\/www\.anime-planet\.com\/manga\/[^\/]+$"
                 ],
                 mobile: true,
                 desktop: true,
@@ -290,6 +290,16 @@ browser.runtime.onInstalled.addListener(() => {
                 ],
                 mobile: true,
                 desktop: true
+            },
+            "entry/showHiddenTags.js": {
+                formattedName: "Show hidden tags",
+                enabled: false,
+                description: 'Shows the content warning tags that are hidden in the overview page of an entry.',
+                allowedUrls: [
+                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
+                ],
+                mobile: true,
+                desktop: true,
             }
         }
     };

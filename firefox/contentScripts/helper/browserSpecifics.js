@@ -9,9 +9,6 @@
         try {
             const response = await browser.runtime.sendMessage({ action: action, requestType: type, value: value });
             if (response && response.value) {
-
-                console.log(type, response.value);
-
                 return response;
             } else {
                 throw new Error('Response did not contain a valid value');
