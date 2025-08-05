@@ -130,12 +130,12 @@
 
             customTitleInput.addEventListener('input', async function () {
 
-                this.value = this.value.replace(/\s+/g, ' ');
+                this.value = this.value.replace(/\s+/g, ' ').trim();
             
                 try {
-                    if (this.value.trim() === '') {
+                    if (this.value === '') {
                         document.dispatchEvent(new CustomEvent("removeEntryData", { detail: { type: entryType, id: entryId, key: "customTitle" } }));
-                    } else if (this.value.trim() == entryPageTitle.textContent.trim()) {
+                    } else if (this.value == entryPageTitle.textContent.trim()) {
                         document.dispatchEvent(new CustomEvent("removeEntryData", { detail: { type: entryType, id: entryId, key: "customTitle" } }));
                     } else {
                         document.dispatchEvent(new CustomEvent("updateEntries", { detail: { type: entryType, id: entryId, data: { customTitle: { title: this.value, show: true } } } }));

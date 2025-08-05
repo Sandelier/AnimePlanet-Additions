@@ -10,7 +10,7 @@ var browser = browser || chrome;
 // Afterwards all priority is basically dependency with an dependency and repeat
 // No priority: Last to be injected
 
-browser.runtime.onInstalled.addListener(() => {
+browser.runtime.onInstalled.addListener((details) => {
     const defaultSettings = {
         
         customTags: {},
@@ -21,6 +21,21 @@ browser.runtime.onInstalled.addListener(() => {
         },
 
         pagesToSearch: 1,
+
+        timeCalcMap: {
+            "anime": {
+                "Music Video": 3,
+                "Movie": 90,
+                "Other": 24
+            },
+            "manga": {
+                "Manhwa": 2,
+                "Manga": 3,
+                "Manhua": 2,
+                "Novel Ch": 3,
+                "Other": 60
+            }
+        },
 
         autoFilters: {
             "tags": {
@@ -346,5 +361,7 @@ browser.runtime.onInstalled.addListener(() => {
         });
     });
 
-    browser.runtime.openOptionsPage();
+    if (details.reason === "install") {
+        browser.runtime.openOptionsPage();
+    }
 });

@@ -1,4 +1,4 @@
-function createField(key, value) {
+function createField(key, value, allowAdding, allowRemoving) {
     const fieldContainer = document.createElement('div');
     fieldContainer.classList.add('featuresEditor-field-container');
     
@@ -66,54 +66,60 @@ function createField(key, value) {
                 currentEditorData[key][nestedKey] = nestedInput.value;
             });
 
-            const removeButton = document.createElement('button');
-            removeButton.textContent = '🗑';
-            removeButton.classList.add('remove-btn');
-            removeButton.addEventListener('click', () => {
-                delete currentEditorData[key][nestedKey];
-                setJsonEditor(currentEditorData);
-            });
-
             nestedFieldContainer.appendChild(nestedLabel);
             nestedFieldContainer.appendChild(nestedInput);
-            nestedFieldContainer.appendChild(removeButton);
+
+            if (allowRemoving) {
+                const removeButton = document.createElement('button');
+                removeButton.textContent = '🗑';
+                removeButton.classList.add('remove-btn');
+                removeButton.addEventListener('click', () => {
+                    delete currentEditorData[key][nestedKey];
+                    setJsonEditor(currentEditorData);
+                });
+                nestedFieldContainer.appendChild(removeButton);
+            }
+
             input.appendChild(nestedFieldContainer);
-        });
-
-        const addNestedButton = document.createElement('button');
-        const addBtnTextEle = document.createElement('span');
-        addNestedButton.classList.add('defaultBtnStyle');
-        addBtnTextEle.textContent = `Add ${key}`;
-        addNestedButton.appendChild(addBtnTextEle);
-
-        addNestedButton.addEventListener('click', () => {
-            let newKey = '';
-            
-            while (true) {
-                newKey = prompt("Enter the new key name (max 33 characters):");
-                if (newKey === null) return;
-                if (newKey.length > 33) {
-                    alert("The key name must be 33 characters or fewer.");
-                    continue;
-                }
-                const existingKeys = Object.keys(currentEditorData[key]).map(k => k.toLowerCase());
-
-                if (existingKeys.includes(newKey.toLowerCase())) {
-                    alert("This key already exists.");
-                    continue;
-                }
-                break;
-            }
-            
-            if (newKey) {
-                currentEditorData[key][newKey] = '';
-                setJsonEditor(currentEditorData);
-            }
         });
 
         fieldContainer.appendChild(label);
         fieldContainer.appendChild(input);
-        fieldContainer.appendChild(addNestedButton);
+
+        if (allowAdding) {
+            const addNestedButton = document.createElement('button');
+            const addBtnTextEle = document.createElement('span');
+            addNestedButton.classList.add('defaultBtnStyle');
+            addBtnTextEle.textContent = `Add ${key}`;
+            addNestedButton.appendChild(addBtnTextEle);
+
+            addNestedButton.addEventListener('click', () => {
+                let newKey = '';
+
+                while (true) {
+                    newKey = prompt("Enter the new key name (max 33 characters):");
+                    if (newKey === null) return;
+                    if (newKey.length > 33) {
+                        alert("The key name must be 33 characters or fewer.");
+                        continue;
+                    }
+                    const existingKeys = Object.keys(currentEditorData[key]).map(k => k.toLowerCase());
+
+                    if (existingKeys.includes(newKey.toLowerCase())) {
+                        alert("This key already exists.");
+                        continue;
+                    }
+                    break;
+                }
+
+                if (newKey) {
+                    currentEditorData[key][newKey] = '';
+                    setJsonEditor(currentEditorData);
+                }
+            });
+
+            fieldContainer.appendChild(addNestedButton);
+        }
     // Object
     } else {
         input = document.createElement('input');
@@ -130,13 +136,15 @@ function createField(key, value) {
 }
 
 let currentEditorData = {};
-function setJsonEditor(jsonObj) {
+function setJsonEditor(jsonObj, settingName = "Feature", allowAdding = true, allowRemoving = true) {
     currentEditorData = jsonObj;
     const jsonEditor = document.getElementById('featuresEditor');
     jsonEditor.innerHTML = '';
 
+    document.querySelector('#featuresEditPage h1').textContent = `${settingName} settings`;
+
     Object.keys(jsonObj).forEach(key => {
-        jsonEditor.appendChild(createField(key, jsonObj[key]));
+        jsonEditor.appendChild(createField(key, jsonObj[key], allowAdding, allowRemoving));
     });
 
     document.querySelectorAll('.featuresEditor-field-container input').forEach(input => {
@@ -216,6 +224,9 @@ function saveEditorData() {
 
     let storageKey = parentKey || Object.keys(jsonObj)[0];
 
+    console.log(storageKey);
+    console.log(jsonObj[storageKey]);
+    console.log(jsonObj);
 
     if (jsonObj[storageKey]) {
         localStorageData[storageKey] = jsonObj[storageKey];

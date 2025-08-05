@@ -1,4 +1,8 @@
 
+
+document.getElementById('extVersion').textContent = `Version: ${browser.runtime.getManifest().version}`;
+
+
 let touchStartY = 0;
 let touchEndY = 0;
 
@@ -44,17 +48,21 @@ const featuresEditPage = document.getElementById('featuresEditPage');
 homePage.scrollIntoView();
 
 window.addEventListener('resize', () => {
-    if (!isMobile()) {
-        homePage.scrollIntoView();
+    const inVisualizer = visualizerStats.getBoundingClientRect().top < window.innerHeight;
+    if (inVisualizer) {
+        visualizerMain.scrollIntoView();
+    } else {
+        currentPage.scrollIntoView();
     }
 });
+
+let currentPage = homePage;
 function handleScroll(deltaY, event) {
 
 
-    const visualizerTopBottom = document.getElementById('visualizerStats-topBottom');
-    const isVisualizerOverflowing = visualizerTopBottom.scrollHeight > visualizerTopBottom.clientHeight;
-    if (isVisualizerOverflowing && visualizerTopBottom.contains(event.target)) {
-        const atTopScrollingUp = deltaY < 0 && visualizerTopBottom.scrollTop === 0;
+    const isVisualizerOverflowing = visualizerStats.scrollHeight > visualizerStats.clientHeight;
+    if (isVisualizerOverflowing && visualizerStats.contains(event.target)) {
+        const atTopScrollingUp = deltaY < 0 && visualizerStats.scrollTop === 0;
 
         if (!atTopScrollingUp) {
             return;
@@ -81,7 +89,8 @@ function handleScroll(deltaY, event) {
             return;
         }
     }
-
+    
+    const homeRect = homePage.getBoundingClientRect();
     const scriptsRect = scriptsPage.getBoundingClientRect();
     const featuresEditRect = featuresEditPage.getBoundingClientRect();
     const visualizerMainRect = visualizerMain.getBoundingClientRect();
@@ -90,27 +99,30 @@ function handleScroll(deltaY, event) {
 
     if (deltaY > 0) {
         if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
-            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+            currentPage = scriptsPage;
         } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
-            visualizerMain.scrollIntoView({ behavior: 'smooth' });
-        } else if (homePage.getBoundingClientRect().top === 0) {
-            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+            currentPage = visualizerMain;
+        } else if (homeRect.top === 0) {
+            currentPage = scriptsPage;
         } else if (scriptsRect.top === 0) {
-            visualizerMain.scrollIntoView({ behavior: 'smooth' });
+            currentPage = visualizerMain;
         }
     } else {
-
         if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
-            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+            currentPage = scriptsPage;
         } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
-            visualizerMain.scrollIntoView({ behavior: 'smooth' });
+            currentPage = visualizerMain;
         } else if (visualizerStatsRect.top === 0) {
-            visualizerMain.scrollIntoView({ behavior: 'smooth' });
+            currentPage = visualizerMain;
         } else if (visualizerMainRect.top === 0) {
-            scriptsPage.scrollIntoView({ behavior: 'smooth' });
+            currentPage = scriptsPage;
         } else if (scriptsRect.top === 0) {
-            homePage.scrollIntoView({ behavior: 'smooth' });
+            currentPage = homePage;
         }
+    }
+
+    if (currentPage) {
+        currentPage.scrollIntoView({ behavior: 'smooth' });
     }
 }
 

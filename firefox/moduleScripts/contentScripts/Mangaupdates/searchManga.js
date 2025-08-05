@@ -65,12 +65,20 @@ async function fetchMangaById(id) {
 
 // Search manga using name.
 
-async function fetchMangaByName(name) {
+async function fetchMangaByName(name, year, type) {
   const url = "https://api.mangaupdates.com/v1/series/search";
   const payload = {
     "search": name,
     "per_page": 2,
   };
+
+  if (year !== undefined) {
+    payload.year = year;
+  }
+
+  if (type !== undefined) {
+    payload.type = type;
+  }
 
   try {
     const response = await fetch(url, {
@@ -98,7 +106,12 @@ async function fetchMangaByName(name) {
 
 let lastCallTime = 0;
 
-export async function getMangaInfo(searchName) {
+export async function getMangaInfo(mangaData) {
+
+  const mangaName = mangaData.name;
+  const mangaYear = mangaData.year;
+  const mangaType = mangaData.type;
+
   const now = Date.now();
   
   // just an simple rate limit of 10s.
@@ -109,7 +122,7 @@ export async function getMangaInfo(searchName) {
   lastCallTime = now;
 
   try {
-    const searchData = await fetchMangaByName(searchName);
+    const searchData = await fetchMangaByName(mangaName, mangaYear, mangaType);
 
     if (!searchData) {
       console.log("Failed to fetch manga by name. Exiting...");

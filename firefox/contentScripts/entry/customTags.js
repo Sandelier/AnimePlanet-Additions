@@ -126,38 +126,38 @@
 
 
     function createCustomTag() {
-    const addTagButton = document.getElementById('createTagBtn');
-    addTagButton.addEventListener('click', function() {
-        const newTagInput = document.getElementById('newTagInput');
-        const newTag = newTagInput.value.trim();
-        const tagList = document.querySelector('.tagsList');
-        if (newTag) {
-            const existingTags = tagList.querySelectorAll('li');
-            let tagExists = false;
-        
-            existingTags.forEach(tagItem => {
-                if (tagItem.textContent.toLowerCase() === newTag.toLowerCase()) {
-                    tagExists = true;
-                }
-            });
-
-        
-            if (!tagExists) {
-                const newTagItem = document.createElement('li');
-                newTagItem.textContent = newTag;
-                tagList.appendChild(newTagItem);
-
-                handleCustomTagInLocal(newTag, "removeEntry")
-
-                const tagsSection = document.querySelector("#entry > div > div > div > div.tags > ul");
-                newTagItem.addEventListener("click", function() {
-                    handleTagAction(newTagItem, tagsSection);
+        const addTagButton = document.getElementById('createTagBtn');
+        addTagButton.addEventListener('click', function() {
+            const newTagInput = document.getElementById('newTagInput');
+            const newTag = newTagInput.value.trim();
+            const tagList = document.querySelector('.tagsList');
+            if (newTag) {
+                const existingTags = tagList.querySelectorAll('li');
+                let tagExists = false;
+            
+                existingTags.forEach(tagItem => {
+                    if (tagItem.textContent.toLowerCase() === newTag.toLowerCase()) {
+                        tagExists = true;
+                    }
                 });
+            
+            
+                if (!tagExists) {
+                    const newTagItem = document.createElement('li');
+                    newTagItem.textContent = newTag;
+                    tagList.appendChild(newTagItem);
+                
+                    handleCustomTagInLocal(newTag, "removeEntry")
+                
+                    const tagsSection = document.querySelector("#entry > div > div > div > div.tags > ul");
+                    newTagItem.addEventListener("click", function() {
+                        handleTagAction(newTagItem, tagsSection);
+                    });
+                }
+            
+                newTagInput.value = '';
             }
-        
-            newTagInput.value = '';
-        }
-    });
+        });
     }
 
     function handleCustomTagInLocal(tag, action) {

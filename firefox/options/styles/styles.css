@@ -27,6 +27,7 @@ body {
     flex-direction: column;
     background: linear-gradient(to top, #f1ffab, #ffd8b1);
     text-align: center;
+    position: relative;
 }
 
 #homePage > div,
@@ -79,6 +80,14 @@ body {
     color: rgb(60, 58, 70);
     font-weight: 500;
     font-family: "Roboto", sans-serif;
+}
+
+#homePage > #extVersion {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 5px;
+  font-size: 18px;
 }
 
 @media (max-width: 836px) {
@@ -461,14 +470,12 @@ input:checked + .slider:before {
   text-align: center;
   align-items: stretch;
   justify-content: flex-end;
-  padding: 50px;
+  padding: clamp(10px, 5vw, 50px);
   position: relative;
 }
 
-
 #visualizerStats-header {
-  flex: 1;
-  align-content: center;
+  margin-bottom: 12px;
 }
 
 #visualizerStats-header > h1 {
@@ -492,11 +499,130 @@ input:checked + .slider:before {
   font-family: "Roboto", sans-serif;
 }
 
-#visualizerStats-topBottom {
+#visualizerStats-header-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 0px 20px 0px;
+}
+
+#visualizerStats-header-info > div {
+  padding: 10px 15px;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 1em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+  font-weight: 600;
+}
+
+#visualizerStats-header-info > button {
+  margin: 0;
+}
+
+#visualizerStats-limiter-container,
+#visualizerStats-searchBar-container {
+  display: inline-flex;
+  align-items: center;
+}
+
+#visualizerStats-limiter,
+#visualizerStats-searchBar {
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  padding: 8px 16px;
+  background: rgb(35, 38, 59);
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  transition: transform 0.25s;
+  font-family: sans-serif;
+  border-radius: 7px 0px 0px 7px;
+  margin: 10px 0px;
+
+  width: 200px;
+}
+
+#visualizerStats-limiter:focus,
+#visualizerStats-searchBar {
+  outline: none;
+}
+
+#visualizerStats-limiter::-webkit-inner-spin-button, 
+#visualizerStats-limiter::-webkit-outer-spin-button,
+#visualizerStats-searchBar::-webkit-inner-spin-button
+#visualizerStats-searchBar::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+  margin: 0;
+}
+#visualizerStats-limiter,
+#visualizerStats-searchBar {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  padding-right: 30px;
+  font-size: 16px;
+}
+
+#visualizerStats-searchBar-container {
+  display: none;
+}
+
+#visualizerStats-searchBar {
+  border-radius: 7px;
+}
+
+.limiter-arrows {
+  display: flex;
+  flex-direction: column;
+  max-height: 34px;
+  background: rgb(35, 38, 59);
+  height: 34px;
+  border-radius: 0px 7px 7px 0px;
+  box-shadow: rgba(0, 0, 0, 0.12) 3px 1px 3px, rgba(0, 0, 0, 0.24) 2px 1px 2px;
+}
+
+.limiter-arrows button {
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  user-select: none;
+  border-radius: 3px;
+  background: none;
+}
+.limiter-arrows button:active {
+  color: #b373d1;
+}
+
+#chartSelector > h2 {
+  font-size: 2rem;
+  font-family: "Allan", cursive;
+  font-weight: 400;
+  color: rgb(57, 57, 57);
+  text-shadow:
+    rgba(13, 0, 77, 0.08) 0px 2px 4px,
+    rgba(13, 0, 77, 0.08) 0px 3px 6px,
+    rgba(13, 0, 77, 0.08) 0px 8px 16px;
+  padding: 0;
+  margin: 0;
+}
+
+#chartButtons {
+  user-select: none;
+}
+
+#chartButtons > button {
+  margin: 0;
+}
+
+#visualizerStats-center {
   display: flex; 
   justify-content: space-evenly; 
   align-items: center;
   overflow: hidden;
+  flex: 1;
 }
 
 
@@ -507,4 +633,166 @@ input:checked + .slider:before {
   height: 100%;
   right: -100%;
   background: inherit;
+}
+
+
+/* Activity Heatmap */
+
+#heatmap-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#yearsHeatmap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  
+  max-width: 540px;
+  overflow-x: scroll;
+  max-height: 150px;
+  padding: 20px;
+}
+
+#heatmap-container .year,
+#heatmap-container .month {
+  min-width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  background-color: #e2e8f0;
+  display: flex;
+  justify-content: center;
+  color: #111;
+  cursor: default;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+  font-weight: 700;
+  transition: background-color 0.3s, transform 0.2s, color 0.2s;
+  user-select: none;
+  flex-direction: column;
+}
+
+#monthsHeatmap {
+  border-top: 1px solid black;
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  justify-items: center;
+}
+
+#heatmap-container .year:not(.disabled):hover,
+#heatmap-container .month:not(.disabled):hover {
+  transform: scale(1.05);
+  filter: brightness(1.15);
+}
+
+#heatmap-container .disabled {
+  background-color: rgba(0,0,0, 0.7) !important;
+  color: white !important;
+  cursor: not-allowed !important;
+}
+
+#heatmap-container .year {
+  cursor: pointer
+}
+
+#heatmap-container .year:hover {
+  box-shadow: 0 6px 15px rgb(0 0 0 / 0.2);
+}
+
+#heatmap-container .year.active {
+  box-shadow: 0 6px 15px rgb(37,99,235,0.8);
+  border: 2px solid #6a00ff;
+}
+
+#heatmap-container .year:hover .tooltip,
+#heatmap-container .month:hover .tooltip {
+  opacity: 1;
+}
+
+#heatmap-container .month .label {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+#heatmap-container .month .count {
+  font-size: 0.8em;
+}
+
+/* Heatmap Tooltip */
+#heatmap-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.75);
+  color: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+#heatmap-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+}
+
+#heatmap-tooltip > p:first-of-type {
+  margin-bottom: 6px !important;
+  font-weight: bolder !important;
+}
+
+#heatmap-tooltip > p {
+  margin: 0;
+  font-weight: lighter;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+/* */
+
+/* Questions */
+
+#questionsInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+#questionsInfo > h1 {
+  font-size: 3rem;
+  font-family: "Allan", cursive;
+  font-weight: 400;
+  color: rgb(57, 57, 57);
+  text-shadow: rgba(13, 0, 77, 0.08) 0px 2px 4px, rgba(13, 0, 77, 0.08) 0px 3px 6px, rgba(13, 0, 77, 0.08) 0px 8px 16px;
+  padding: 0;
+  margin: 0;
+}
+
+#questionsInfo > span {
+  padding: 0;
+  margin: 0;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 18px;
+  color: rgb(60, 58, 70);
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+}
+
+#questionsInfo > span > strong {
+  font-weight: 700;
+  font-size: 20px;
+  color: black;
 }

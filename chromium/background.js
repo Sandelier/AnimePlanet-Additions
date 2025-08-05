@@ -23,6 +23,10 @@ async function executeContentScript(url, tabId) {
     if (url.includes('dontInjectScripts') || url.includes('.com/search.php')) {
         return;
     }
+    
+    console.clear();
+    console.log(`url: ${url}, tabId: ${tabId}`)
+    const totalStartTime = performance.now();
 
     try {
 
@@ -143,7 +147,7 @@ async function executeContentScript(url, tabId) {
             try {
                 await Promise.race([
                     browser.scripting.executeScript({
-                        target: { tabId, allFrames: true },
+                        target: { tabId },
                         files: [`contentScripts/${scriptName}`],
                     }),
                     new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout injecting: ${scriptName}`)), 1000))
@@ -155,11 +159,52 @@ async function executeContentScript(url, tabId) {
             }
         }
 
+        // Workaround so we dont need to have tabs permission. This is still not perfect since the background script can go idle which would destroy the communcation
+        await browser.scripting.executeScript({
+            target: { tabId },
+            func: (tabId => {
+                (function() {
+                    const injectedScripts = document.getElementById("apfeatures-injectedScripts");
+
+                    if (injectedScripts) {
+                    	const data = injectedScripts.getAttribute("data-current-scripts");
+                    	try {
+                    		const scripts = JSON.parse(data);
+                        
+                    		if (scripts.includes("helper/VisibilityChecker")) {
+                    			return;
+                    		}
+                    	} catch (e) {
+                    		console.error("Failed to parse injected scripts", e);
+                    	}
+                    }
+
+                    document.dispatchEvent(new CustomEvent("injectedScript", {detail: { name: "helper/VisibilityChecker" }}));
+                    
+                    function notifyIfVisible() {
+                    	if (document.visibilityState === "visible" && document.hasFocus()) {
+                    		chrome.runtime.sendMessage({
+                    			action: "tabVisibility",
+                    			value: {
+                    				tabId,
+                    				url: window.location.href
+                    			}
+                    		});
+                    	}
+                    }
+
+                    document.addEventListener("visibilitychange", notifyIfVisible);
+                    window.addEventListener("focus", notifyIfVisible);
+                })();
+            }),
+            args: [tabId]
+        });
+
         // Injecting scripts with no priority
         const nonPrioritizedPromises = nonPrioritizedScripts.map(({ scriptName }) =>
             Promise.race([
                 browser.scripting.executeScript({
-                    target: { tabId, allFrames: true },
+                    target: { tabId },
                     files: [`contentScripts/${scriptName}`],
                 }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout injecting: ${scriptName}`)), 1000))
@@ -178,11 +223,13 @@ async function executeContentScript(url, tabId) {
             }
         });
 
-        console.log(`Total injection time: ${(performance.now() - injectionStartTime).toFixed(2)}ms`);
+        console.log(`Total injection time: ${(performance.now() - injectionStartTime).toFixed(1)}ms`);
 
     } catch (error) {
         console.error('Failed to execute content script:', error);
     }
+
+    console.log(`Total execution time: ${(performance.now() - totalStartTime).toFixed(1)}ms`);
 }
 
 function isScriptTypeAllowed(url, allowedArray) {
@@ -245,6 +292,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'PCMode':
             changeToPcMode(message.value);
+        
+        case `tabVisibility`:
+            executeContentScript(message.value.url, message.value.tabId);
+            break;
         default:
             console.warn('Unknown action:', message.action);
             break;
@@ -255,11 +306,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 
-function checkTabUrl(url, tabId) {
-    if (url.startsWith('https://www.anime-planet.com/')) {
-        executeContentScript(url, tabId);
-    }
-}
 
 
 
@@ -268,26 +314,7 @@ function checkTabUrl(url, tabId) {
 
 browser.webNavigation.onCommitted.addListener((details) => {
     if (details.url.startsWith('https://www.anime-planet.com')) {
-
         injectedScripts.delete(details.tabId);
-		checkTabUrl(details.url, details.tabId);
+        executeContentScript(details.url, details.tabId);
     }
 });
-
-// When different tab is clicked
-function getCurrentTab() {
-	return browser.tabs.query({ active: true, currentWindow: true });
-}
-
-const onActivatedHandler = (activeInfo) => {
-	getCurrentTab().then((tabs) => {
-		const currentTab = tabs[0];
-        
-		if (currentTab.status === "complete" && currentTab.url) {
-			checkTabUrl(currentTab.url, currentTab.id);
-		}
-	});
-};
-  
-
-browser.tabs.onActivated.addListener(onActivatedHandler);

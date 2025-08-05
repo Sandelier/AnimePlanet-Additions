@@ -69,7 +69,7 @@
 					case "ok":
 						getDataBtn.textContent = "Update data";	
 
-						main(mangaInfo.data.associated, mangaInfo.data.status, mangaInfo.data.url, mangaInfo.data.description, mangaInfo.data.publications, mangaInfo.data.year, true);
+						main(mangaInfo.data.associated, mangaInfo.data.status, mangaInfo.data.categories, mangaInfo.data.genres, mangaInfo.data.url, mangaInfo.data.description, mangaInfo.data.publications, mangaInfo.data.year, true);
 						break;
 					case "rateLimit":
 						console.log('Rate limit reached. Please wait before retrying.');
@@ -127,15 +127,23 @@
 		const mangaMagazine = document.querySelector('div.md-1-5:nth-child(2) > a');
 		const mangaYear = document.querySelector('div.md-1-5:nth-child(3) > span');
 
-		function main(mangaOtherNames, status, muLink, mangaDesc, mangaPublications, mangaStartYear, saveToEntries = false) {
+		function main(mangaOtherNames, status, categories, muTags, muLink, mangaDesc, mangaPublications, mangaStartYear, saveToEntries = false) {
 
-			status = status.replace(/[*•]/g, '');
+			if (status) {
+				status = status.replace(/[*•]/g, '');
+			}
 
 			let entryJson = { MU: {
 				"url": muLink,
 				"status": status
 			}};
 			mangaDesc = decodeHTMLEntities(mangaDesc);
+
+			// Removes markdown links
+			mangaDesc = mangaDesc.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, "");
+
+			// Removes links
+			mangaDesc = mangaDesc.replace(/https?:\/\/[^\s)]+/g, "");
 
 			// Many contain like "From Square Enix:" or something similar at the start
 			mangaDesc = mangaDesc.replace(/^From\s[^:]+:/, "");
@@ -145,16 +153,45 @@
 			mangaDesc = mangaDesc.replace(/\*{2,}/g, "");
 
 			// The ending of description typically contains like orginal translation links and etc or official links
-			mangaDesc = mangaDesc.replace(/(.)?(Original|Official|Links)[\s\S]*/, "");
+			mangaDesc = mangaDesc.replace(/(.)?(Original|Official|Links|Source)[\s\S]*/, "");
 
 			// Removing all <br> texts and then splitting it when we encounter an <b> or <a>
 			mangaDesc = mangaDesc.replace(/<BR><BR>/g, " ");
 			mangaDesc = mangaDesc.replace(/<BR>/g, "");
 			mangaDesc = mangaDesc.split(/<b>|<a|<!/)[0];
 
+			// Encountered this in "knight under my heart"
+			// Removes the orginal text from mu description if its at the start of it.
+			if (mangaDescriptionElement && mangaDesc.startsWith(mangaDescriptionElement.textContent)) {
+				mangaDesc = mangaDesc.slice(mangaDescriptionElement.textContent.length);
+			}
+
+			if (mangaDesc.length <= 20) {
+				mangaDesc = "";
+			}
+
 			if (mangaOtherNames.length > 0) {
-				addToAltTitles(mangaOtherNames);
-				entryJson.MU.mangaOtherNames = mangaOtherNames.map(obj => obj.title);
+				const seen = new Set();
+				const cleanedOtherNames = [];
+
+				// Just a simple clean so we dont need to store as much useless data
+				// It would be better to return the values from addtoalttitle but there is an problem with when updating data so for now it will be like this
+				// This still in example keeps some useless data in example if alttiles already has "Hey"
+				for (const obj of mangaOtherNames) {
+					const cleaned = obj.title
+  						.normalize('NFD') // Removes those unique letters like ủ 
+  						.replace(/[^\w]|_/g, '') // Removes all non word characters like !
+  						.toLowerCase();
+
+
+					if (!seen.has(cleaned)) {
+						seen.add(cleaned);
+						cleanedOtherNames.push(obj);
+					}
+				}
+
+				addToAltTitles(cleanedOtherNames);
+				entryJson.MU.mangaOtherNames = cleanedOtherNames.map(obj => obj.title);
 			}
 
 			if (mangaDesc && mangaDesc != undefined && mangaDesc != "undefined") {
@@ -180,8 +217,101 @@
 				entryJson.MU.mangaPublications = mangaPublications;
 			}
 
-			if (saveToEntries) {
 
+			// Tags
+			if (muTags || categories) {
+				const tagsContainer = document.querySelector("section#entry.pure-g.EntryPage__content div.tags ul");
+						
+				let currentTagElements = Array.from(tagsContainer.querySelectorAll("li:not([class])"));
+				const existingTagsText = currentTagElements.map(el => el.textContent.trim().toLowerCase());
+			
+				let lastTagElement = currentTagElements[currentTagElements.length - 1];
+			
+				const insertTag = (text, href, color, className) => {
+					const tagElement = document.createElement('li');
+					tagElement.classList.add(className);
+				
+					const link = document.createElement('a');
+					link.textContent = text;
+					link.style.color = color;
+					if (href) {
+						link.href = href;
+						link.target = "_blank";
+					}
+					tagElement.appendChild(link);
+				
+					if (lastTagElement) {
+						lastTagElement.insertAdjacentElement('afterend', tagElement);
+					} else {
+						tagsContainer.appendChild(tagElement);
+					}
+					lastTagElement = tagElement;
+				};
+			
+
+				// MU Tags
+				if (muTags) {
+
+					// We making the json into array so we dont save useless data
+					if (muTags[0]?.genre) {
+						const genresArray = muTags.map(muTag => muTag.genre.trim());
+						muTags = genresArray.filter(genre => {
+							const genreClean = genre.toLowerCase();
+							return !existingTagsText.some(existingTag => existingTag === genreClean);
+						});
+					}
+				
+					// If we updating the data and this found elements then we will skip the inserting of tags
+					const existingMuTagElements = Array.from(tagsContainer.querySelectorAll("li.mu-tag"));
+					if (existingMuTagElements.length === 0) {
+						muTags.forEach(muTag => {
+							// tagLink dosent work on everything but well its better than nothing ig
+							const tagLink = muTag.toLowerCase().replace(/\s+/g, '-');
+							insertTag(muTag, `/manga/tags/${tagLink}`, "#ff8c15", 'mu-tag');
+						});
+					}
+
+					entryJson.MU.tags = muTags;
+				}
+			
+				// Categories
+				if (categories) {
+
+					// Have to recalculate it again due to mutags adding more tags
+					currentTagElements = [
+						...Array.from(tagsContainer.querySelectorAll("li:not([class])")),
+						...Array.from(tagsContainer.querySelectorAll("li.mu-tag"))
+					];
+				
+					const combinedTagsText = currentTagElements.map(el => el.textContent.trim().toLowerCase());
+				
+					// Check for when we make the category into an array so that it dosent run this again. We making it an array so we dont need to store so much useless data
+					if (categories[0]?.category !== undefined) {
+						categories = categories
+							// We sorting by most votes
+							.sort((a, b) => b.votes - a.votes)
+							.slice(0, 25 - currentTagElements.length)
+							// We dont really care about those low vote ones so we just ignore those ones that have 10x less votes
+							.filter((cat, _, arr) => arr[0].votes < (cat.votes === 0 ? 1 : cat.votes) * 10)
+							.map(({ category }) => category.replace(/\//g, "").trim())
+							.filter(category =>
+								!combinedTagsText.some(existingTag => existingTag === category.toLowerCase())
+							);
+					}
+
+					// If we updating the data and this found elements then we will skip the inserting of tags
+					const existingCategoryElements = Array.from(tagsContainer.querySelectorAll("li.category-tag"));
+					if (existingCategoryElements.length === 0) {
+						categories.forEach(category => {
+							insertTag(category, null, "#A7C7E7", 'category-tag');
+						});
+					}
+			
+					entryJson.MU.categories = categories;
+				}
+			}
+
+			if (saveToEntries) {
 				const formElement = document.querySelector('.md-3-5 > form');
 				const entryId = formElement.getAttribute('data-id');
 				const entryType = formElement.getAttribute('data-mode');
@@ -190,7 +320,10 @@
 
 			}
 
+
 			// Mu link to notes
+			if (document.querySelector('div.notes a.mangaupdates-link')) return;
+
 			if (muLink) {
 
 				const dataContainer = document.querySelector('section#entry.pure-g.EntryPage__content div.pure-1.md-2-3 div.pure-1.md-3-5');
@@ -279,8 +412,16 @@
 		// Description
 		// isToggleable is when description is not orginally there. so when we add the new description it will not need to have toggle btn
 		function createDescription(description, isToggleable) {
+
+			const currentMuSynopsis = document.getElementById('mangaupdates-synopsis');
+			if (currentMuSynopsis) {
+				currentMuSynopsis.textContent === description;
+				return;
+			}
+
 		    const divSynopsis = document.createElement('div');
 		    divSynopsis.classList.add('synopsisManga');
+			divSynopsis.id = "mangaupdates-synopsis";
 		    if (isToggleable) {
 		        divSynopsis.style.display = 'none';
 		    }
@@ -328,40 +469,53 @@
 
 		// Alt titles
 		function addToAltTitles(otherNames) {
+			const mainTitle = document.querySelector('h1[itemprop="name"]').textContent.trim();
 
-			if (!altTitles.textContent.trim()) {
-				const altTitlesTextNode = document.createTextNode('Alt titles: ');
-				altTitles.appendChild(altTitlesTextNode);
-			} 
+			// Removes all commas and whitespaces because earlier there were a lot of duplicates
+			const normalize = str => str.replace(/[\s,]+/g, '').toLowerCase();
 
+			const normalizedMain = normalize(mainTitle);
+			const existingAltText = altTitles.textContent.trim();
+
+			if (!existingAltText) {
+				altTitles.appendChild(document.createTextNode('Alt titles: '));
+			}
+
+			const normalizedAltText = normalize(existingAltText.replace(/^Alt\s+titles?:\s*/, ''));
 
 			if (otherNames.length >= 3) {
 				altTitles.textContent = altTitles.textContent.replace('Alt title:', 'Alt titles:');
 			}
 
-			const mainTitle = document.querySelector('h1[itemprop="name"]').textContent.trim();
-			const altTitlesText = altTitles.textContent.replace(/^Alt titles: /, '').trim();
-    		const altTitlesArray = altTitlesText ? altTitlesText.split(', ').map(title => title.trim()) : [];
+			const seenTitles = new Set();
 
-    		const altTitlesSet = new Set(altTitlesArray);
+			// Retrieving only unique names
+			otherNames = otherNames.filter(nameObj => {
+				const normalizedTitle = normalize(nameObj.title);
 
-    		otherNames = otherNames.filter(nameObj => {
-				const trimmedTitle = nameObj.title.trim();
-				return trimmedTitle !== mainTitle && !altTitlesSet.has(trimmedTitle);
+				if ( normalizedTitle === normalizedMain ||
+					normalizedAltText.includes(normalizedTitle) ||
+					seenTitles.has(normalizedTitle) ) {
+
+					return false;
+				}
+				seenTitles.add(normalizedTitle);
+				// We making the comma into U+201A so that we can split the alt titles easily in cleaneralttitles.
+				nameObj.title = nameObj.title.replace(/,/g, '\u201A');
+				return true;
 			});
 
 			if (otherNames.length > 0) {
 				const newTitles = otherNames.map(nameObj => nameObj.title.trim()).join(', ');
-				let trimmedText = altTitles.textContent.trim();
+				let altText = altTitles.textContent.trim();
 
-				if (trimmedText.includes(":") && !trimmedText.includes(": ")) {
-					trimmedText = trimmedText.replace(":", ": ");
+				if (altText.includes(":") && !altText.includes(": ")) {
+					altText = altText.replace(":", ": ");
 				}
-			
-				if (trimmedText === "Alt titles:" || trimmedText === "Alt title:") {
-					altTitles.textContent = trimmedText + " " + newTitles;
+				if (altText === "Alt titles:" || altText === "Alt title:") {
+					altTitles.textContent = altText + " " + newTitles;
 				} else {
-					altTitles.textContent = trimmedText + ", " + newTitles;
+					altTitles.textContent = altText + ", " + newTitles;
 				}
 			}
 		}
@@ -437,7 +591,29 @@
 				getDataBtn.disabled = true;
 				getDataBtn.style.cursor = 'not-allowed';
 
-				await getMangaInfo(mangaName);
+
+				const mangaInfo = {
+					name: mangaName
+				}
+				
+				// year
+				const yearEle = document.querySelector('div#siteContainer div.pure-1.md-1-5 span.iconYear');
+				if (yearEle) {
+					// year ele should always start with the year if i am not wrong 
+					mangaInfo.year = yearEle.textContent.trim().slice(0, 4);
+				}
+
+				// Type
+				let currentTagElements = Array.from(document.querySelectorAll("section#entry.pure-g.EntryPage__content div.tags ul li:not([class])"));
+				let hasManhuaOrManwha = currentTagElements.some(el => {
+					let text = el.textContent.trim().toLowerCase();
+					return text === "manhua" || text === "manwha";
+				});
+
+				mangaInfo.type = hasManhuaOrManwha ? null : "Manga";
+
+
+				await getMangaInfo(mangaInfo);
 
 				getDataBtn.disabled = false;
 				getDataBtn.style.cursor = 'pointer';
@@ -449,7 +625,7 @@
 
 				const muData = entries[entryType][entryId].MU;
 				muData.mangaOtherNames = (muData.mangaOtherNames ?? []).map(title => ({ title }));
-				main(muData.mangaOtherNames, muData?.status, muData?.url, muData.mangaDesc, muData.mangaPublications, muData.mangaStartYear);
+				main(muData.mangaOtherNames, muData?.status, muData.categories, muData?.tags, muData?.url, muData.mangaDesc, muData.mangaPublications, muData.mangaStartYear);
 			}
 		})();
 	}

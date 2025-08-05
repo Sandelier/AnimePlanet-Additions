@@ -1,94 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AP-Additions - Options</title>
-
-    <link rel="stylesheet" href="styles/featuresEdit.css">
-    <link rel="stylesheet" href="styles/styles.css">
-    
-    <script src="stylingScript.js" defer></script>
-    <script src="script.js" defer></script>
-    <script src="featuresEdit.js" defer></script>
-    <script src="visualizer/visualizer-main.js" defer></script>
-    <script src="visualizer/visualizer-stats.js" defer></script>
-
-    <script src="visualizer/chart.js"></script>
-</head>
-<body>
-    <div id="mainContent">
-        <div id="homePage">
-            
-            <h1>Animeplanet Additions</h1>
-            <p>Extension to add features and fixing inconveniences i have had with animeplanet.</p>
-            <div>
-                <button id="importBtn" class="defaultBtnStyle"><span>Import</span></button>
-                <button id="exportBtn" class="defaultBtnStyle"><span>Export</span></button>
-                <input type="file" id="fileInput" accept=".json" style="display:none"/>
-
-                <button id="resetBtn" class="defaultBtnStyle"><span>Reset</span></button>
-                <button id="featuresBtn" class="defaultBtnStyle"><span>Features</span></button>
-                <button id="visualizerBtn" class="defaultBtnStyle"><span>Visualizer</span></button>
-
-                <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank" id="githubBtn" class="defaultBtnStyle"><span>Github</span></a>
-            </div>
-        </div>
-
-        <div id="scriptsPage">
-
-            <div id="featuresContainer">
-                <h1>Features</h1>
-
-                <div id="scripts-container"></div>
-                <div id="card-tooltip"></div>
-            </div>
-            <div id="featuresEditPage">
-                <h1>Feature settings</h1>
-                <button id="feature-saveBtn" class="defaultBtnStyle"><span>Save</span></button>
-                <div id="featuresEditor"></div>
-            </div>
-        </div>
-
-        <div id="visualizerPage">
-            <div id="visualizerMain">
-                <h1>AP Visualizer</h1>
-                <p>Scrapes an list and visualizes the data from it</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AP-Additions - Options</title>
+        <link rel="stylesheet" href="styles/featuresEdit.css">
+        <link rel="stylesheet" href="styles/styles.css">
+        <script src="stylingScript.js" defer></script>
+        <script src="script.js" defer></script>
+        <script src="featuresEdit.js" defer></script>
+        <script src="visualizer/visualizer-main.js" defer></script>
+        <script src="visualizer/visualizer-stats.js" defer></script>
+        <script src="visualizer/chart.js"></script>
+    </head>
+    <body>
+        <div id="mainContent">
+            <div id="homePage">
+                <h1>Animeplanet Additions</h1>
+                <p>Extension to add features and fixing inconveniences i have had with animeplanet.</p>
                 <div>
-                    <button id="visualizer-startBtn" class="defaultBtnStyle"><span>Start</span></button>
-
-                    <button id="visualizer-animeStatsBtn" class="defaultBtnStyle deactivatedBtn"><span>Anime</span></button>
-                    <button id="visualizer-mangaStatsBtn" class="defaultBtnStyle deactivatedBtn"><span>Manga</span></button>
-
+                    <button id="importBtn" class="defaultBtnStyle">
+                        <span>Import</span>
+                    </button>
+                    <button id="exportBtn" class="defaultBtnStyle">
+                        <span>Export</span>
+                    </button>
+                    <input type="file" id="fileInput" accept=".json" style="display:none" />
+                    <button id="resetBtn" class="defaultBtnStyle">
+                        <span>Reset</span>
+                    </button>
+                    <button id="featuresBtn" class="defaultBtnStyle">
+                        <span>Features</span>
+                    </button>
+                    <button id="visualizerBtn" class="defaultBtnStyle">
+                        <span>Visualizer</span>
+                    </button>
+                    <a href="https://github.com/Sandelier/AnimePlanet-Additions" target="_blank" id="githubBtn" class="defaultBtnStyle">
+                        <span>Github</span>
+                    </a>
+                </div>
+                <h1 id="extVersion"></h1>
+            </div>
+            <div id="scriptsPage">
+                <div id="featuresContainer">
+                    <h1>Features</h1>
+                    <div id="scripts-container"></div>
+                    <div id="card-tooltip"></div>
+                </div>
+                <div id="featuresEditPage">
+                    <h1>Feature settings</h1>
+                    <button id="feature-saveBtn" class="defaultBtnStyle">
+                        <span>Save</span>
+                    </button>
+                    <div id="featuresEditor"></div>
                 </div>
             </div>
-
-            <div id="visualizerStart">
-
-                <p>Provide username and select data type to start scraping data from their list</p>
-                <div>
-                    <input id="visualizerStart-usernameField" placeholder="Username" type="text">
-
+            <div id="visualizerPage">
+                <div id="visualizerMain">
+                    <h1>AP Visualizer</h1>
+                    <p>Scrapes an list and visualizes the data from it</p>
                     <div>
-                        <button id="mangaType" class="defaultBtnStyle dataTypeSelected"><span>Manga</span></button>
-                        <button id="animeType" class="defaultBtnStyle"><span>Anime</span></button>
+                        <button id="visualizer-startBtn" class="defaultBtnStyle">
+                            <span>Start</span>
+                        </button>
+                        <button id="visualizer-animeStatsBtn" class="defaultBtnStyle deactivatedBtn">
+                            <span>Anime</span>
+                        </button>
+                        <button id="visualizer-mangaStatsBtn" class="defaultBtnStyle deactivatedBtn">
+                            <span>Manga</span>
+                        </button>
+                        <button id="visualizer-settingsBtn" class="defaultBtnStyle">
+                            <span>Settings</span>
+                        </button>
                     </div>
                 </div>
-                <button id="scrapeBtn" class="defaultBtnStyle"><span>Start scraping</span></button>
+                <div id="visualizerStart">
+                    <p>Provide username and select data type to start scraping data from their list</p>
+                    <div>
+                        <input id="visualizerStart-usernameField" placeholder="Username" type="text">
+                        <div>
+                            <button id="mangaType" class="defaultBtnStyle dataTypeSelected">
+                                <span>Manga</span>
+                            </button>
+                            <button id="animeType" class="defaultBtnStyle">
+                                <span>Anime</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button id="scrapeBtn" class="defaultBtnStyle">
+                        <span>Start scraping</span>
+                    </button>
+                </div>
+            </div>
+            <div id="visualizerStats">
+                <div id="visualizerStats-header">
+                    <h1>Sandelier's manga list</h1>
+                    <p></p>
+                    <div id="visualizerStats-header-info">
+                        <input type="file" id="visualizer-fileInput" accept=".json" style="display:none" />
+                        <button id="visualizer-importJson" class="defaultBtnStyle">
+                            <span>Import</span>
+                        </button>
+                        <button id="visualizer-exportJson" class="defaultBtnStyle">
+                            <span>Export</span>
+                        </button>
+                        <div id="visualizer-totalEntries"></div>
+                        <div id="visualizer-installments"></div>
+                        <div id="visualizer-volumes"></div>
+                        <div id="visualizer-perDay"></div>
+                        <div id="visualizer-timeSpent"></div>
+                    </div>
+                    <div id="chartSelector">
+                        <h2>Select Chart to Display</h2>
+                        <div id="chartButtons">
+                            <button data-chart="types" class="defaultBtnStyle">
+                                <span>Types</span>
+                            </button>
+                            <button data-chart="years" class="defaultBtnStyle">
+                                <span>Pub. year</span>
+                            </button>
+                            <button data-chart="tags" class="defaultBtnStyle">
+                                <span>Tags</span>
+                            </button>
+                            <button data-chart="sources" class="defaultBtnStyle">
+                                <span>Sources</span>
+                            </button>
+                            <button data-chart="serializers" class="defaultBtnStyle">
+                                <span>Serializers</span>
+                            </button>
+                            <button data-chart="statuses" class="defaultBtnStyle">
+                                <span>Statuses</span>
+                            </button>
+                            <button data-chart="ratings" class="defaultBtnStyle">
+                                <span>Ratings</span>
+                            </button>
+                            <button data-chart="activity" class="defaultBtnStyle">
+                                <span>Activity Map</span>
+                            </button>
+                        </div>
+                        <div id="visualizerStats-limiter-container">
+                            <input id="visualizerStats-limiter" type="text" value="1" min="1">
+                            <div class="limiter-arrows">
+                                <button class="limiter-up">▲</button>
+                                <button class="limiter-down">▼</button>
+                            </div>
+                        </div>
+                        <div id="visualizerStats-searchBar-container">
+                            <input id="visualizerStats-searchBar" type="text" placeholder="Search label">
+                        </div>
+                    </div>
+                </div>
+                <div id="visualizerStats-center">
+                    <div chart-type="questions" dontRemove>
+                        <div id="questionsInfo">
+                            <h1>Activity map</h1>
+                            <span>Activity map only works when you're <strong>logged in</strong> and scraping <strong> your own page</strong>, because it downloads your ap backup data which requires your session token </span>
+
+                            <h1>Time</h1>
+                            <span>Time calculations can be changed in settings. (You need to scrape the data again)</span>
+
+                            <h1>Why are some entries missing?</h1>
+                            <span>We are skipping every entry that is at <strong>0 chapters or episodes</strong></span>
+                        </div>
+                    </div>
+
+                    <div chart-type="activity" currentlimit="0" maxlimit="hide" searchbar="false" dontRemove>
+                        <div id="heatmap-container">
+                            <div id="yearsHeatmap"></div>
+                            <div id="monthsHeatmap"></div>
+                            <div id="heatmap-tooltip">
+                                <p></p>
+                                <p></p>
+                                <p></p>
+                                <p></p>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="spaceWaster"></div>
             </div>
         </div>
-
-        <div id="visualizerStats">
-
-            <div id="visualizerStats-header">
-                <h1>Sandelier's manga list</h1>
-                <p></p>
-                <button id="exportJsonDataBtn" class="defaultBtnStyle"><span>Export json</span></button>
-            </div>
-            <div id="visualizerStats-topBottom"></div>
-            <div id="visualizerStats-bottom"></div>
-            <div class="spaceWaster"></div>
-        </div>
-    </div>
-</body>
+    </body>
 </html>

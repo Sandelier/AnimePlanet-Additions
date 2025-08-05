@@ -32,22 +32,68 @@
             altTitles.classList.add('aka');
             mangaNameElement.parentNode.insertBefore(altTitles, mangaNameElement.nextSibling);
         } else {
-            const textContent = altTitles.textContent;
-            const separatorIndex = textContent.indexOf(': ');
-    
-            if (separatorIndex !== -1) {
-                const prefix = textContent.substring(0, separatorIndex);
-                const titles = textContent.substring(separatorIndex + 2);
-    
-                const titlesArray = titles.split(', ');
-    
-                altTitles.textContent = prefix + ':';
-    
-                titlesArray.forEach(title => {
-                    const pElement = document.createElement('p');
-                    pElement.textContent = title;
-                    altTitles.appendChild(pElement);
+            const textContent = altTitles.textContent.trim();
+            // We are adding an invisible unicode character so if user later on adds an alttitle we can stil split the old alt titles
+            const ZWSP = '\u200B';
+
+            if (textContent.startsWith("Alt titles:") || textContent.startsWith("Alt title:")) {
+                const prefix = textContent.startsWith("Alt titles:") ? "Alt titles:" : "Alt title:";
+                const titles = textContent.substring(prefix.length).trim();
+
+                function commaSplit(str) {
+                    if (!str.includes('(') && !str.includes(')')) {
+                        return str.split(',').map(s => s.trim());
+                    }
+
+                    // Had to include this since in example if alt title contains "(Oh, sorry)" we dont want to treat it as two separate alt titles
+                    const result = [];
+                    let current = '';
+                    let insideParens = false;
+
+                    for (const char of str) {
+                        // We inside an paranthesis
+                        if (char === '(') {
+                            insideParens = true;
+                            current += char;
+                        // Ending of paranthesis
+                        } else if (char === ')') {
+                            insideParens = false;
+                            current += char;
+                        // Alt title found
+                        } else if (char === ',' && !insideParens) {
+                            result.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                
+                    if (current) {
+                        result.push(current.trim());
+                    }
+                
+                    return result;
+                }
+
+                const commaParts = commaSplit(titles);
+
+                
+                // Making and adding the titles to alttitles element
+                const fragment = document.createDocumentFragment();
+
+                commaParts.forEach(part => {
+                    part.split(ZWSP).forEach(subPart => {
+                        const title = subPart.trim();
+                        if (title) {
+                            const pElement = document.createElement('p');
+                            pElement.textContent = `${ZWSP}${title}`;
+                            fragment.appendChild(pElement);
+                        }
+                    });
                 });
+
+                altTitles.textContent = prefix;
+                altTitles.appendChild(fragment);
             }
         }
     }

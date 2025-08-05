@@ -11,10 +11,10 @@
             if (response && response.value) {
                 return response;
             } else {
-                throw new Error('Response did not contain a valid value');
+                throw new Error('Response did not contain a valid value', action, type);
             }
         } catch (error) {
-            throw new Error(`Failed to get value for ${type}: ${error}`);
+            throw new Error(`Failed to get value for ${type}, action: ${action}: ${error}`);
         }
     }
 
