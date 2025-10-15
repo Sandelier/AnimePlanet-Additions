@@ -39,14 +39,6 @@ async function executeContentScript(url, tabId) {
     }
 } 
 
-
-browser.webNavigation.onCommitted.addListener((details) => {
-    if (details.url.startsWith('https://www.anime-planet.com')) {
-        executeContentScript(details.url, details.tabId);
-    }
-});
-
-
 let scrapedData = [];
 let doneScraping = false;
 let pageOpenedId;
@@ -54,9 +46,11 @@ let pageOpenedId;
 let backupFetchPromise = null;
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log(message, scrapedData);
-    if (message.action === "userToken") {
+    
+    if (message.action === "bootstrap" && message.scraper === true) {
+        executeContentScript(message.value, sender.tab.id);
 
+    } else if (message.action === "userToken") {
         backupFetchPromise = fetch(`https://www.anime-planet.com/api/export/${message.type}/${message.token}?`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

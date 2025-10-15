@@ -147,7 +147,7 @@ function createScriptsPage(contentScripts) {
 
         // User is not meant to close them.
         if (!cardContainer.classList.contains('notSupported')) {
-            if (!scriptName.startsWith('helper/')) {
+            if (!scriptName.startsWith('helper/') && !scriptName.startsWith('trackScripts.js')) {
                 toggleScript(cardContainer, script.enabled, scriptName);
             } else {
                 cardContainer.classList.toggle('option-card-enabled');

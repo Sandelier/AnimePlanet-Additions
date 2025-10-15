@@ -10,6 +10,7 @@
             if (item.tooltip.dataset.stillLeft === 'true') {
                 return;
             }
+            
 
             let totalEpisodes;
             let totalChapters;
@@ -28,7 +29,12 @@
             }
 
             const totalAmounth = !totalEpisodes ? totalChapters : totalEpisodes;
+
+            if (!item.tooltip.querySelector('div.statusArea span')) return;
+
             const currentCountEle = item.tooltip.querySelector('div.statusArea span').nextSibling;
+            if (!currentCountEle) return;
+            
             const currentCount = currentCountEle.textContent.replace(/[^0-9]/g, '');
             if (currentCount.length === 0) {
                 return;

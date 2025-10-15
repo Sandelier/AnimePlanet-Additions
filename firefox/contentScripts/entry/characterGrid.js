@@ -58,24 +58,10 @@
     .infoContainer {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         width: 100%;
         position: relative;
         padding: 2px 0px 2px 0px;
-    }
-
-    .heartSwitch {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
-    .leftSwitch {
-        left: 0
-    }
-
-    .rightSwitch {
-        right: 0
     }
 
 
@@ -135,11 +121,11 @@
         const charLove = avatar.parentElement.querySelector('td.tableCharLove');
 
         const likeSpan = document.createElement('span');
-        likeSpan.classList.add('heartSwitch', 'leftSwitch');
+        likeSpan.classList.add('heartSwitch');
         likeSpan.appendChild(charLove.querySelector('span.heartSwitch > a.heartOn'));
         
         const dislikeSpan = document.createElement('span');
-        dislikeSpan.classList.add('heartSwitch', 'rightSwitch');
+        dislikeSpan.classList.add('heartSwitch');
         dislikeSpan.appendChild(charLove.querySelector('span.heartSwitch > a.heartOff'));
 
 

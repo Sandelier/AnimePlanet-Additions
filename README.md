@@ -112,10 +112,7 @@ You can enable/disable features on the options page of the addon. You can access
 
 3. **Sort by Random**  
    Adds a random button on the dropdown menu of sorting.
-
-4. **Show hidden tags**
-   Shows the content warning tags that are hidden in the overview page of an entry.
-
+   
 </details>
 
 

@@ -24,7 +24,7 @@
     let contentScripts = {};
     let missedScriptNames = [];
 
-    // Adding "Scripts" element into menu
+    // Adding "Scripts" to menu
     const menuList = document.querySelector('ul#menuRoot');
 
     const scriptsEle = document.createElement('li');
@@ -40,18 +40,23 @@
 
     menuList.appendChild(scriptsEle);
 
+    function addScriptToMenu(name) {
+        if (!dropdownMenu.querySelector(`a[data-script="${name}"]`)) {
+            const dropElement = document.createElement('li');
+            const scriptNameEle = document.createElement('a');
+            scriptNameEle.textContent = contentScripts[name]?.formattedName || name;
+            scriptNameEle.setAttribute('data-script', name);
+            dropElement.appendChild(scriptNameEle);
+            dropdownMenu.appendChild(dropElement);
+        }
+    }
+
     document.addEventListener("injectedScript", function(event) {
         const { name } = event.detail;
-        // We might miss an script before we get the response for content scripts
         if (!contentScripts[name]) {
             missedScriptNames.push(name);
         } else {
-            const dropElement = document.createElement('li');
-            const scriptNameEle = document.createElement('a');
-            scriptNameEle.textContent = contentScripts[name].formattedName;
-
-            dropElement.appendChild(scriptNameEle);
-            dropdownMenu.appendChild(dropElement);
+            addScriptToMenu(name);
         }
     });
 
@@ -60,14 +65,23 @@
 
     missedScriptNames.forEach((name) => {
         if (contentScripts[name]) {
-            const dropElement = document.createElement('li');
-            const scriptNameEle = document.createElement('a');
-            scriptNameEle.textContent = contentScripts[name].formattedName;
-
-            dropElement.appendChild(scriptNameEle);
-            dropdownMenu.appendChild(dropElement);
+            addScriptToMenu(name);
         }
     });
 
+
+    // Need to do this since we will otherwise miss the scripts added through importing at bootstrap.js
+    const apfeaturesEle = document.getElementById('apfeatures-injectedScripts');
+    if (apfeaturesEle) {
+
+        let currentScripts = JSON.parse(apfeaturesEle.dataset.currentScripts);
+        currentScripts.forEach(name => {
+            if (!name.startsWith('helper/')) {
+                addScriptToMenu(name);
+            }
+        });
+    }
+
     document.dispatchEvent(new CustomEvent("injectedScript", { detail: { name: "other/scriptsLoaded.js" } }));
+
 })();

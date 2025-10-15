@@ -232,6 +232,8 @@
 
         // Adds plus sign button to tags section
         const tagsSection = document.querySelector('#entry > div > div > div > div.tags > ul');
+        if (!tagsSection) return;
+
         addCustomTagBtn = document.createElement('li');
         addCustomTagBtn.classList.add('addCustomTagBtn');
         addCustomTagBtn.textContent = "+";
@@ -352,7 +354,7 @@
             const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$/;
             const tagsContainer = document.querySelector('.customTagsContainer .tagsList');
 
-            if (urlRegex.test(currentUrl)) {
+            if (urlRegex.test(currentUrl) && tagsContainer) {
 
                 Object.keys(customTags).forEach(tagName => {
                     let tagCreated = false;
@@ -398,11 +400,21 @@
 
             // Adds custom tags to tooltips
             const tooltipData = window.tooltipData;
-            if (tooltipData.length > 0) {
+            if (tooltipData && tooltipData.length > 0) {
                 tooltipData.forEach(data => {
                     const tooltipCard = data.tooltip.parentElement;
-                    const id = tooltipCard.getAttribute('data-id');
-                    const type = tooltipCard.getAttribute('data-type');
+                    let id = tooltipCard.getAttribute('data-id');
+                    let type = tooltipCard.getAttribute('data-type');
+
+                    if (!id || !type) {
+                        const parent = tooltipCard.parentElement;
+                        const form = parent.querySelector('td > form');
+                        if (form) {
+                            id = form.getAttribute('data-id');
+                            type = form.getAttribute('data-mode');
+                        }
+                    }
+
                     const parsedTitleTags = data.parsedTitle.querySelector('.tags ul');
                     const entryKey = `${type}${id}`;
                 

@@ -99,10 +99,10 @@
                     break;
 
                 // Custom filters
-                case 'chapters-filters-to':
+                case 'to-chapters':
                     formattedString = `chapters≤${value.text.replace('Chapters ≤ ', '')}`;
                     break;
-                case 'chapters-filters-from':
+                case 'from-chapters':
                     formattedString = `chapters≥${value.text.replace('Chapters ≥ ', '')}`;
                     break;
                 case 'containsTag':

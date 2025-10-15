@@ -4,11 +4,10 @@
   {
     "manifest_version": 3,
     "name": "Animeplanet Additions",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "description": "Extension to add features and fixing inconveniences i have had with animeplanet.",
     "permissions": [
       "scripting",
-      "webNavigation",
       "storage"
     ],
 
@@ -42,10 +41,42 @@
 
     "web_accessible_resources": [
       {
-        "resources": ["images/mangaupdates_modified.svg"],
-        "matches": ["<all_urls>"]
+        "resources": [
+          "images/mangaupdates_modified.svg", 
+
+          "contentScripts/trackScripts.js",
+          "contentScripts/helper/browserSpecifics.js",
+          "contentScripts/other/scriptsLoaded.js",
+          "contentScripts/helper/parseTooltips.js",
+          "contentScripts/helper/filter-newTabEntries.js",
+          "contentScripts/helper/interceptFetch.js",
+          "contentScripts/helper/updateEntryData.js",
+          "contentScripts/helper/PC-Mode.js",
+          "contentScripts/other/load-extrapages.js",
+          "contentScripts/filter/applyBtn-AlwaysOn.js",
+          "contentScripts/filter/quick-apply.js",
+          "contentScripts/filter/tags-search.js",
+          "contentScripts/forum/clickableUsername.js",
+          "contentScripts/filter/chapter.js",
+          "contentScripts/filter/contains.js",
+          "contentScripts/list/removeEntry.js",
+          "contentScripts/filter/autoFilter.js",
+          "contentScripts/entry/getMangaupdatesData.js",
+          "contentScripts/entry/add-EntryNotes.js",
+          "contentScripts/entry/customTags.js",
+          "contentScripts/entry/stillLeft.js",
+          "contentScripts/filter/showFiltering.js",
+          "contentScripts/list/multiselect.js",
+          "contentScripts/entry/customTitleName.js",
+          "contentScripts/entry/cleanerAltTitles.js",
+          "contentScripts/entry/characterGrid.js",
+          "contentScripts/other/sortRandom.js"
+        
+        ],
+        "matches": ["https://www.anime-planet.com/*"]
       }
     ],
+
 
     "browser_specific_settings": {
       "gecko": {
@@ -55,6 +86,14 @@
       "gecko_android": {
         "strict_min_version": "131.0"
       }
-    }
+    },
+
+    "content_scripts": [
+      {
+        "matches": ["https://www.anime-planet.com/*"],
+        "js": ["contentScripts/bootstrap.js"],
+        "run_at": "document_start"
+      }
+  ]
 }
   

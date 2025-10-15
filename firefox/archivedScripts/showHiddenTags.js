@@ -1,3 +1,6 @@
+// Noticed while working on update 2.0.3 that animeplanet has removed the hidden tags from script[type="application/ld+json"]
+// I was expecting for it to be removed at some point since it probably affects the ads
+// Think probably i was the reason it was noticed since i did send an message to them about this.
 
 
 (function() {

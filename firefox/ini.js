@@ -4,7 +4,6 @@ var browser = browser || chrome;
 
 /* Initilization */
 
-// Priority 0: Tracking scripts
 // Priority 1: Helper scripts without dependencies
 // Priority 2: Helper scripts with helper dependencies
 // Afterwards all priority is basically dependency with an dependency and repeat
@@ -48,13 +47,13 @@ browser.runtime.onInstalled.addListener((details) => {
         },
     
         contentScripts: {
-            "helper/trackScripts.js": { 
+            "trackScripts.js": { 
                 formattedName: "Track scripts",
                 enabled: true,
                 description: "Helper script to keep track of current scripts in the page.",
                 mobile: true,
                 desktop: true,
-                priority: 0
+                elementDependency: 'body'
             },
             "helper/browserSpecifics.js": { 
                 formattedName: "Browser specifics",
@@ -62,7 +61,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "Helper script to make content scripts work for chromium and firefox.",
                 mobile: true,
                 desktop: true,
-                priority: 1
+                priority: 1,
+                elementDependency: 'html' 
             },
             "other/scriptsLoaded.js": { 
                 formattedName: "Scripts Loaded",
@@ -71,8 +71,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 priority: 4,
-                dependencies: ['helper/browserSpecifics.js']
-                
+                dependencies: ['helper/browserSpecifics.js'],
+                elementDependency: 'ul#menuRoot'
             },
             "helper/parseTooltips.js": { 
                 formattedName: "Tooltip parse",
@@ -81,7 +81,10 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 priority: 3,
-                dependencies: ['helper/PC-Mode.js']
+                dependencies: ['helper/PC-Mode.js'],
+                elementDependency: 'footer',
+
+                tooltipPage: true
             },
             "helper/filter-newTabEntries.js": {
                 formattedName: "Easier filter tabs",
@@ -89,7 +92,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "Helper script to add new filter methods.",
                 mobile: true,
                 desktop: true,
-                priority: 1
+                priority: 1,
+                elementDependency: '.tabsUl > li > a'
             },
             "helper/interceptFetch.js": { 
                 formattedName: "Intercept fetch",
@@ -98,7 +102,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 chrome: false,
-                priority: 1
+                priority: 1,
+                elementDependency: 'head'
             },
             "helper/updateEntryData.js": { 
                 formattedName: "Update entry data",
@@ -107,7 +112,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 priority: 2,
-                dependencies: ['helper/browserSpecifics.js']
+                dependencies: ['helper/browserSpecifics.js'],
+                elementDependency: 'html' 
                 
             },
 
@@ -119,6 +125,7 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: false,
                 priority: 2,
+                elementDependency: 'a.tooltip'
             },
 
             "other/load-extrapages.js": {
@@ -133,14 +140,16 @@ browser.runtime.onInstalled.addListener((details) => {
                 changeableData: "pagesToSearch",
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js', 'helper/parseTooltips.js']
+                dependencies: ['helper/browserSpecifics.js', 'helper/parseTooltips.js'],
+                elementDependency: 'div.pagination.aligncenter'
             },
             "filter/applyBtn-AlwaysOn.js": {
                 formattedName: "Apply button shown",
                 enabled: false,
                 description: "Makes the apply button on filters to be always shown.",
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: 'div.pillFilters'
             },
             "filter/quick-apply.js": {
                 formattedName: "Quick apply",
@@ -148,14 +157,16 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "New button to filter current mangas/animes in the page without loading next page.",
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/parseTooltips.js']
+                dependencies: ['helper/parseTooltips.js'],
+                elementDependency: '.pillLabel'
             },
             "filter/tags-search.js": {
                 formattedName: "Tags search",
                 enabled: false,
                 description: "Adds an search bar for tags.",
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: '#advanced_more_tags'
             },
             "forum/clickableUsername.js": {
                 formattedName: "Clickable usernames",
@@ -165,7 +176,8 @@ browser.runtime.onInstalled.addListener((details) => {
                     "https:\\/\\/www\\.anime-planet\\.com\\/forum\\/members\\/[^\\.]+\\.\\d+\\/"
                 ],
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: '.memberHeader-nameWrapper > span.username'
             },
             "filter/chapter.js": {
                 formattedName: "Chapter filtering",
@@ -176,7 +188,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 ],
                 mobile: true,
                 desktop: true,
-                dependencies: ['filter/quick-apply.js']
+                dependencies: ['helper/filter-newTabEntries.js', 'filter/quick-apply.js'],
+                elementDependency: '#multipletags'
             },
             "filter/contains.js": {
                 formattedName: "Contains filtering",
@@ -184,7 +197,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "Filters entries that dont contain any of the tags defined in current page.",
                 mobile: true,
                 desktop: true,
-                dependencies: ['filter/quick-apply.js']
+                dependencies: ['helper/filter-newTabEntries.js', 'filter/quick-apply.js'],
+                elementDependency: '#multipletags'
             },
             "list/removeEntry.js": {
                 formattedName: "List entry remover",
@@ -197,7 +211,9 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 chrome: false,
-                dependencies: ['helper/interceptFetch.js']
+                dependencies: ['helper/interceptFetch.js'],
+                elementDependency: '#addToCustomList',
+                entryPage: true
             },
             "filter/autoFilter.js": { 
                 formattedName: "Auto filters",
@@ -206,7 +222,8 @@ browser.runtime.onInstalled.addListener((details) => {
                 changeableData: "autoFilters",
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js']
+                dependencies: ['helper/browserSpecifics.js'],
+                elementDependency: '#multipletags'
             },
             "entry/getMangaupdatesData.js": { 
                 formattedName: "Extra manga data",
@@ -217,7 +234,9 @@ browser.runtime.onInstalled.addListener((details) => {
                 ],
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js']           
+                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js'],
+                elementDependency: 'section#entry.pure-g.EntryPage__content div.tags li',
+                entryPage: true
             },
             "entry/add-EntryNotes.js": { 
                 formattedName: "Notes",
@@ -225,7 +244,10 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "Allows you to add notes to any manga/anime",
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js'] 
+                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js'],
+                elementDependency: '#siteFooter',
+                entryPage: true,
+                tooltipPage: true
             },
             "entry/customTags.js": { 
                 formattedName: "Custom tags",
@@ -233,18 +255,20 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: "Allows creating and adding of custom tags to entries",
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js']
+                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js'],
+                elementDependency: '#siteFooter',
+
+                entryPage: true,
+                tooltipPage: true
             },
             "entry/stillLeft.js": { 
                 formattedName: "Still left",
                 enabled: false,
                 description: "Shows episodes or chapters still left on entry.",
-                allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
-                ],
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/parseTooltips.js'] 
+                dependencies: ['helper/parseTooltips.js'],
+                tooltipPage: true
             },
             "filter/showFiltering.js": { 
                 formattedName: "Shows filter options",
@@ -254,7 +278,8 @@ browser.runtime.onInstalled.addListener((details) => {
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
                 ],
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: '#qaForm'
             },
             "list/multiselect.js": {
                 formattedName: "List multiselect",
@@ -266,7 +291,9 @@ browser.runtime.onInstalled.addListener((details) => {
                 mobile: true,
                 desktop: true,
                 chrome: false,
-                dependencies: ['helper/interceptFetch.js']
+                dependencies: ['helper/interceptFetch.js'],
+                elementDependency: '#addToCustomList',
+                entryPage: true
             },
             "entry/customTitleName.js": {
                 formattedName: "Custom entry title",
@@ -274,17 +301,19 @@ browser.runtime.onInstalled.addListener((details) => {
                 description: 'Allows you to set the title of an entry.',
                 mobile: true,
                 desktop: true,
-                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js'] 
+                dependencies: ['helper/browserSpecifics.js', 'helper/updateEntryData.js', 'helper/parseTooltips.js'],
+                elementDependency: '#siteFooter',
+                entryPage: true,
+                tooltipPage: true
             },
             "entry/cleanerAltTitles.js": {
                 formattedName: "Cleaner alt titles",
                 enabled: false,
                 description: "Splits alt titles from commas into blocks",
-                allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
-                ],
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: 'h2.aka',
+                entryPage: true
             },
             "entry/characterGrid.js": {
                 formattedName: "Character grid",
@@ -294,7 +323,8 @@ browser.runtime.onInstalled.addListener((details) => {
                     "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\/]+\/characters$"
                 ],
                 mobile: true,
-                desktop: true
+                desktop: true,
+                elementDependency: 'tr > td.tableCharLove'
             },
             "other/sortRandom.js": {
                 formattedName: "Sort by random",
@@ -304,17 +334,8 @@ browser.runtime.onInstalled.addListener((details) => {
                     "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
                 ],
                 mobile: true,
-                desktop: true
-            },
-            "entry/showHiddenTags.js": {
-                formattedName: "Show hidden tags",
-                enabled: false,
-                description: 'Shows the content warning tags that are hidden in the overview page of an entry.',
-                allowedUrls: [
-                    "https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$"
-                ],
-                mobile: true,
                 desktop: true,
+                elementDependency: 'div.sortFilter select'
             }
         }
     };

@@ -28,5 +28,5 @@
         });
     }
     
-    document.dispatchEvent(new CustomEvent("injectedScript", { detail: { name: "helper/trackScripts.js" } }));
+    document.dispatchEvent(new CustomEvent("injectedScript", { detail: { name: "trackScripts.js" } }));
 })();

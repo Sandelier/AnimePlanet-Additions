@@ -22,7 +22,6 @@
             width: 100%;
             resize: none;
             overflow: hidden;
-            line-break: anywhere;
             height: 60px;
         }
 
@@ -77,9 +76,8 @@
         let entries = response.value;
     
         // For entry page
-        const pattern = new RegExp("https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$");
-
-        if (pattern.test(window.location.href)) {
+        // every other page in entrypage does not contain the entry id so we can't modify it in like recommendations
+        if (document.querySelector('div.entrySynopsis')) {
             const entryPageTitle = document.querySelector('h1[itemprop="name"]');
             entryPageTitle.style.display = "none";
 
@@ -96,8 +94,6 @@
             customTitleInput.classList.add('customTitle');
 
 
-
-            
             if (thisEntry?.customTitle && thisEntry.customTitle.show === true) {
                 customTitleInput.value = thisEntry.customTitle.title;
                 customTitleInput.style.fontStyle = "italic";
@@ -172,33 +168,55 @@
         // For tooltips
         
         const tooltipData = window.tooltipData;
-        tooltipData.forEach(item => {
-            const tooltip = item.tooltip;
+        if (tooltipData) {
+            tooltipData.forEach(item => {
+                const tooltip = item.tooltip;
 
-            const cardEle = item.tooltip.parentElement;
-            const entryId = cardEle.getAttribute('data-id');
-            const entryType = cardEle.getAttribute('data-type');
+                let cardEle = item.tooltip.parentElement;
+                let entryId = cardEle.getAttribute('data-id');
+                let entryType = cardEle.getAttribute('data-type');
 
-            const customTitle = entries[entryType]?.[entryId]?.customTitle;
+                let noIconTooltip = false;
 
-            if (customTitle && customTitle.title) {
-
-                const cardNameEle = tooltip.querySelector('h3.cardName');
-                cardNameEle.style.display = "none";
-
-                const customCardEle = document.createElement('h3');
-                customCardEle.classList.add('customTitleTooltip');
-                customCardEle.textContent = customTitle.title;
-
-                if (customTitle.show === false) {
-                    cardNameEle.style.display = "block";
-                    customCardEle.style.display = "none";
+                // For tooltips where you cant see an icon (different structure) like /manga/top-manga
+                if (!entryId || !entryType) {
+                    const parent = cardEle.parentElement;
+                    const form = parent.querySelector('td > form');
+                    if (form) {
+                        entryId = form.getAttribute('data-id');
+                        entryType = form.getAttribute('data-mode');
+                        cardEle = form;
+                        noIconTooltip = true;
+                    }
                 }
 
+                const customTitle = entries[entryType]?.[entryId]?.customTitle;
 
-                cardNameEle.parentNode.insertBefore(customCardEle, cardNameEle);
-            }
-        });
+                if (customTitle && customTitle.title) {
+                    if (!noIconTooltip) {
+                        // For tooltips where they have an icon (different structure)
+                        const cardNameEle = tooltip.querySelector('h3.cardName');
+                        cardNameEle.style.display = "none";
+
+                        const customCardEle = document.createElement('h3');
+                        customCardEle.classList.add('customTitleTooltip');
+                        customCardEle.textContent = customTitle.title;
+
+                        if (customTitle.show === false) {
+                            cardNameEle.style.display = "block";
+                            customCardEle.style.display = "none";
+                        }
+
+                        cardNameEle.parentNode.insertBefore(customCardEle, cardNameEle);
+
+                    } else {
+                        if (customTitle.show === true) {
+                            tooltip.textContent = customTitle.title;
+                        }
+                    }
+                }
+            });
+        }
     } else {
         console.log('Failed to retrieve entries');
     }

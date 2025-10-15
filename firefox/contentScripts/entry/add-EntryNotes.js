@@ -122,19 +122,27 @@
             const response = await callRequestFromLocal('getLocalStorageValue', 'entries');
             if (response && response.value) {
                 const entriesData = response.value;
-                const currentUrl = window.location.href;
-                const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+$/;
 
-                if (urlRegex.test(currentUrl)) {
-                    addNote(entriesData);
+
+                if (document.querySelector('.md-3-5 > form')) {
+                    const currentUrl = window.location.href;
+                    const urlRegex = /https:\/\/www\.anime-planet\.com\/(manga|anime)\/[^\.\/]+(?!\/recommendations)$/;
+
+                    if (urlRegex.test(currentUrl)) {
+                        addNote(entriesData);
+                    }
                 }
 
                 const tooltipData = window.tooltipData;
+                if (!tooltipData) return;
+                
                 tooltipData.forEach(item => {
                     const type = item.tooltip.parentElement.getAttribute('data-type');
                     const id = item.tooltip.parentElement.getAttribute('data-id');
 
                     const tooltipImage = item.tooltip.querySelector("div.crop");
+                    
+                    if (!type || !id) return;
 
                     const note = entriesData[type][id]?.note || "";
 
