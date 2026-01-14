@@ -1,238 +1,104 @@
-function createField(key, value, allowAdding, allowRemoving) {
-    const fieldContainer = document.createElement('div');
-    fieldContainer.classList.add('featuresEditor-field-container');
-    
-    const label = document.createElement('label');
-    label.textContent = key;
-    
-    let input;
-    // Array json
-    if (Array.isArray(value)) {
-        input = document.createElement('div');
-        input.classList.add('array-field');
-
-        value.forEach((item, index) => {
-            const arrayItemContainer = document.createElement('div');
-            arrayItemContainer.classList.add('featuresEditor-field-container');
-            
-            const arrayItemInput = document.createElement('input');
-            arrayItemInput.type = 'text';
-            arrayItemInput.value = item;
-            arrayItemInput.addEventListener('input', () => {
-                currentEditorData[key][index] = arrayItemInput.value;
-            });
-
-            const removeButton = document.createElement('button');
-            removeButton.textContent = '🗑';
-            removeButton.classList.add('remove-btn');
-            removeButton.addEventListener('click', () => {
-                currentEditorData[key].splice(index, 1);
-                setJsonEditor(currentEditorData);
-            });
-
-            arrayItemContainer.appendChild(arrayItemInput);
-            arrayItemContainer.appendChild(removeButton);
-            input.appendChild(arrayItemContainer);
-        });
-
-        const addButton = document.createElement('button');
-        addButton.classList.add('defaultBtnStyle');
-        const addBtnTextEle = document.createElement('span');
-        addBtnTextEle.textContent = 'Add Value';
-        addButton.appendChild(addBtnTextEle);
-        addButton.addEventListener('click', () => {
-            currentEditorData[key].push('');
-            setJsonEditor(currentEditorData);
-        });
-
-        fieldContainer.appendChild(label);
-        fieldContainer.appendChild(input);
-        fieldContainer.appendChild(addButton);
-    // Nested object
-    } else if (typeof value === 'object' && value !== null) {
-        input = document.createElement('div');
-        input.classList.add('nested-object');
-
-        Object.keys(value).forEach(nestedKey => {
-            const nestedFieldContainer = document.createElement('div');
-            nestedFieldContainer.classList.add('featuresEditor-field-container');
-            const nestedLabel = document.createElement('label');
-            nestedLabel.textContent = nestedKey;
-            
-            const nestedInput = document.createElement('input');
-            nestedInput.type = 'text';
-            nestedInput.value = value[nestedKey];
-            nestedInput.addEventListener('input', () => {
-                currentEditorData[key][nestedKey] = nestedInput.value;
-            });
-
-            nestedFieldContainer.appendChild(nestedLabel);
-            nestedFieldContainer.appendChild(nestedInput);
-
-            if (allowRemoving) {
-                const removeButton = document.createElement('button');
-                removeButton.textContent = '🗑';
-                removeButton.classList.add('remove-btn');
-                removeButton.addEventListener('click', () => {
-                    delete currentEditorData[key][nestedKey];
-                    setJsonEditor(currentEditorData);
-                });
-                nestedFieldContainer.appendChild(removeButton);
-            }
-
-            input.appendChild(nestedFieldContainer);
-        });
-
-        fieldContainer.appendChild(label);
-        fieldContainer.appendChild(input);
-
-        if (allowAdding) {
-            const addNestedButton = document.createElement('button');
-            const addBtnTextEle = document.createElement('span');
-            addNestedButton.classList.add('defaultBtnStyle');
-            addBtnTextEle.textContent = `Add ${key}`;
-            addNestedButton.appendChild(addBtnTextEle);
-
-            addNestedButton.addEventListener('click', () => {
-                let newKey = '';
-
-                while (true) {
-                    newKey = prompt("Enter the new key name (max 33 characters):");
-                    if (newKey === null) return;
-                    if (newKey.length > 33) {
-                        alert("The key name must be 33 characters or fewer.");
-                        continue;
-                    }
-                    const existingKeys = Object.keys(currentEditorData[key]).map(k => k.toLowerCase());
-
-                    if (existingKeys.includes(newKey.toLowerCase())) {
-                        alert("This key already exists.");
-                        continue;
-                    }
-                    break;
-                }
-
-                if (newKey) {
-                    currentEditorData[key][newKey] = '';
-                    setJsonEditor(currentEditorData);
-                }
-            });
-
-            fieldContainer.appendChild(addNestedButton);
-        }
-    // Object
-    } else {
-        input = document.createElement('input');
-        input.type = 'text';
-        input.value = value;
-        input.addEventListener('input', () => {
-            currentEditorData[key] = input.value;
-        });
-    }
-
-    fieldContainer.appendChild(label);
-    fieldContainer.appendChild(input);
-    return fieldContainer;
-}
-
 let currentEditorData = {};
-function setJsonEditor(jsonObj, settingName = "Feature", allowAdding = true, allowRemoving = true) {
-    currentEditorData = jsonObj;
-    const jsonEditor = document.getElementById('featuresEditor');
-    jsonEditor.innerHTML = '';
-
-    document.querySelector('#featuresEditPage h1').textContent = `${settingName} settings`;
-
-    Object.keys(jsonObj).forEach(key => {
-        jsonEditor.appendChild(createField(key, jsonObj[key], allowAdding, allowRemoving));
-    });
-
-    document.querySelectorAll('.featuresEditor-field-container input').forEach(input => {
-        input.style.width = (input.value.length) + 4 + 'ch';
-
-        input.addEventListener('input', (event) => {
-
-            if (event.target.value.length <= 0) {
-                input.style.width = 4 + 'ch';
-            } else {
-                input.style.width = (event.target.value.length) + 4 + 'ch';
-            }
-
-        });
-
-        input.addEventListener('beforeinput', (event) => {
-            if (input.value.length >= 34 && event.inputType !== "deleteContentBackward") {
-                event.preventDefault();
-            }
-        });
-    });
-}
+let originalEditorValue = "";
+let currentlyEditing = undefined;
+const editor = document.getElementById("featuresEditor");
+const highlight = document.getElementById("jsonHighlight");
+const saveBtn = document.getElementById("feature-saveBtn");
+const headerText = document.getElementById("editorHeader"); 
 
 
+editor.addEventListener("keydown", (e) => {
+    if (e.key === "Tab") {
+        e.preventDefault();
 
-// Saving settings
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
 
-document.getElementById('feature-saveBtn').addEventListener('click', () => {
-    saveEditorData();
+        const value = editor.value;
+        editor.value = value.substring(0, start) + "  " + value.substring(end);
+
+        editor.selectionStart = editor.selectionEnd = start + 2;
+
+        highlightJSON();
+    }
 });
 
-function saveEditorData() {
-    let jsonObj = {};
-    const parentKey = document.getElementById('featuresEditor').dataset.key;
-    
-    const fieldContainers = document.querySelectorAll('#featuresEditor > div.featuresEditor-field-container');
+editor.addEventListener("scroll", () => {
+    highlight.scrollTop = editor.scrollTop;
+    highlight.scrollLeft = editor.scrollLeft;
+});
 
-    fieldContainers.forEach(field => {
-        const labelEle = field.querySelector('label');
-        if (!labelEle) return;
+function highlightJSON() {
+    highlight.innerHTML = Prism.highlight(editor.value, Prism.languages.json, "json");
 
-        const label = labelEle.textContent;
-        let value = null;
+    try {
+        JSON.parse(editor.value);
 
-        const input = field.querySelector('input');
-        if (input && !field.querySelector('.nested-object')) {
-            value = input.value.trim();
+        const isChanged = editor.value !== originalEditorValue;
+
+        if (isChanged) {
+            saveBtn.classList.remove("deactivatedBtn");
+            saveBtn.classList.add("validJson");
+        } else {
+            saveBtn.classList.remove("deactivatedBtn");
+            saveBtn.classList.remove("validJson");
         }
 
-        const arrayFields = field.querySelectorAll('.array-field');
-        arrayFields.forEach(arrayField => {
-            const arrayValues = [];
-            const inputs = arrayField.querySelectorAll('input');
-            inputs.forEach(input => {
-                const trimmedValue = input.value.trim();
-                if (trimmedValue) arrayValues.push(trimmedValue);
-            });
-            if (arrayValues.length > 0) value = arrayValues;
-        });
-
-        const nestedFields = field.querySelectorAll('.nested-object');
-        nestedFields.forEach(nestedField => {
-            const nestedJson = {};
-            const nestedInputs = nestedField.querySelectorAll('input');
-            nestedInputs.forEach(nestedInput => {
-                const key = nestedInput.previousElementSibling.textContent;
-                const trimmedValue = nestedInput.value.trim();
-                if (trimmedValue) nestedJson[key] = trimmedValue;
-            });
-            if (Object.keys(nestedJson).length > 0) value = nestedJson;
-        });
-
-        if (value !== null && value !== "") {
-            jsonObj[label] = value;
-        }
-    });
-
-    let storageKey = parentKey || Object.keys(jsonObj)[0];
-
-    console.log(storageKey);
-    console.log(jsonObj[storageKey]);
-    console.log(jsonObj);
-
-    if (jsonObj[storageKey]) {
-        localStorageData[storageKey] = jsonObj[storageKey];
-        browser.storage.local.set({ [storageKey]: jsonObj[storageKey] });
-    } else {
-        localStorageData[storageKey] = jsonObj;
-        browser.storage.local.set({ [storageKey]: jsonObj });
+    } catch {
+        saveBtn.classList.add("deactivatedBtn");
+        saveBtn.classList.remove("validJson");
     }
 }
+
+function setJsonEditor(jsonObj) {
+
+    if (currentlyEditing === editor.dataset.key) {
+        return;
+    }
+
+    headerText.querySelector('span').textContent = editor.dataset.formattedKey;
+    currentlyEditing = editor.dataset.key;
+
+    currentEditorData = jsonObj || {};
+    originalEditorValue = JSON.stringify(currentEditorData, null, 4);
+
+    editor.value = originalEditorValue;
+    highlightJSON();
+}
+
+function saveEditorData() {
+
+    if (saveBtn.classList.contains("deactivatedBtn")) {
+        return;
+    }
+
+    try {
+        const jsonObj = JSON.parse(editor.value);
+        currentEditorData = jsonObj;
+
+        const parentKey = editor.dataset.key;
+        const storageKey = parentKey || Object.keys(jsonObj)[0];
+
+        if (jsonObj[storageKey]) {
+            localStorageData[storageKey] = jsonObj[storageKey];
+            if (typeof browser !== "undefined" && browser.storage) {
+                browser.storage.local.set({ [storageKey]: jsonObj[storageKey] });
+            }
+        } else {
+            localStorageData[storageKey] = jsonObj;
+            if (typeof browser !== "undefined" && browser.storage) {
+                browser.storage.local.set({ [storageKey]: jsonObj });
+            }
+        }
+
+        originalEditorValue = editor.value;
+        saveBtn.classList.remove("validJson");
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+document.getElementById("featuresEditor").addEventListener("input", highlightJSON);
+
+saveBtn.addEventListener("click", saveEditorData);

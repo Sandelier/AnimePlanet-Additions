@@ -102,15 +102,16 @@
 
                 // Adding the old title to alt titles
                 let altTitles = document.querySelector('h2.aka');
+                const formattedTitle = entryPageTitle.textContent.replace(/,/g, '\u201A');
 
                 if (!altTitles) {
                     altTitles = document.createElement('h2');
-                    altTitles.textContent = `Alt titles: ${entryPageTitle.textContent}`;
+                    altTitles.textContent = `Alt titles: ${formattedTitle}`;
                     altTitles.classList.add('aka');
 
                     entryPageTitle.insertAdjacentElement('afterend', altTitles);
                 } else {
-                    altTitles.textContent = `${altTitles.textContent.trim()}, ${entryPageTitle.textContent}`;
+                    altTitles.textContent = `${altTitles.textContent.trim()}, ${formattedTitle}`;
                 }
 
                 // Setting the document title to have the custom title.

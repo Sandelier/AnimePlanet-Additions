@@ -1,6 +1,6 @@
 
 
-document.getElementById('extVersion').textContent = `Version: ${browser.runtime.getManifest().version}`;
+document.getElementById('nextVersion').textContent = `Version: ${browser.runtime.getManifest().version}`;
 
 
 let touchStartY = 0;
@@ -60,63 +60,71 @@ let currentPage = homePage;
 function handleScroll(deltaY, event) {
 
 
-    const isVisualizerOverflowing = visualizerStats.scrollHeight > visualizerStats.clientHeight;
-    if (isVisualizerOverflowing && visualizerStats.contains(event.target)) {
-        const atTopScrollingUp = deltaY < 0 && visualizerStats.scrollTop === 0;
+    const isOverflowing = el => el.scrollHeight > el.clientHeight;
+    const isAtTop = el => el.scrollTop === 0;
+    const isAtBottom = el => el.scrollTop + el.clientHeight >= el.scrollHeight;
 
-        if (!atTopScrollingUp) {
-            return;
-        }
+    if (isOverflowing(visualizerStats) && 
+        visualizerStats.contains(event.target) && 
+        !(deltaY < 0 && 
+        isAtTop(visualizerStats))) {
+        return;
     }
 
     const featuresEditor = document.getElementById('featuresEditor');
-    const isfeaturesEditorOverflowing = featuresEditor.scrollHeight > featuresEditor.clientHeight;
-    if (isfeaturesEditorOverflowing && featuresEditor.contains(event.target)) {
+    if (isOverflowing(featuresEditor) && featuresEditor.contains(event.target)) {
         return;
     }
 
     const scriptsContainer = document.getElementById('scripts-container');
-    const isOverflowing = scriptsContainer.scrollHeight > scriptsContainer.clientHeight;
-    if (!isOverflowing && scriptsContainer.contains(event.target) && scriptsContainer != event.target) {
+    if (!isOverflowing(scriptsContainer) && 
+        scriptsContainer.contains(event.target) && 
+        scriptsContainer !== event.target) {
         return;
     }
 
-    if (isOverflowing && scriptsContainer.contains(event.target)) {
-        const atTopScrollingUp = deltaY < 0 && scriptsContainer.scrollTop === 0;
-        const atBottomScrollingDown = deltaY > 0 && scriptsContainer.scrollTop + scriptsContainer.clientHeight >= scriptsContainer.scrollHeight;
+    if (isOverflowing(scriptsContainer) && scriptsContainer.contains(event.target)) {
 
-        if (!atTopScrollingUp && !atBottomScrollingDown) {
+        const canScrollOut =
+            (deltaY < 0 && isAtTop(scriptsContainer)) ||
+            (deltaY > 0 && isAtBottom(scriptsContainer));
+
+        if (!canScrollOut) {
             return;
         }
     }
     
-    const homeRect = homePage.getBoundingClientRect();
-    const scriptsRect = scriptsPage.getBoundingClientRect();
-    const featuresEditRect = featuresEditPage.getBoundingClientRect();
-    const visualizerMainRect = visualizerMain.getBoundingClientRect();
-    const visualizerStartRect = visualizerStart.getBoundingClientRect();
-    const visualizerStatsRect = visualizerStats.getBoundingClientRect();
+    const rects = {
+        home: homePage.getBoundingClientRect(),
+        scripts: scriptsPage.getBoundingClientRect(),
+        featuresEdit: featuresEditPage.getBoundingClientRect(),
+        visMain: visualizerMain.getBoundingClientRect(),
+        visStart: visualizerStart.getBoundingClientRect(),
+        visStats: visualizerStats.getBoundingClientRect(),
+    };
+
+    const inViewportFromSide = rect => rect.x <= window.innerWidth / 1.5 && rect.top === 0; // For the pages that are on side of another page
 
     if (deltaY > 0) {
-        if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
+        if (inViewportFromSide(rects.featuresEdit)) {
             currentPage = scriptsPage;
-        } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
+        } else if (inViewportFromSide(rects.visStart)) {
             currentPage = visualizerMain;
-        } else if (homeRect.top === 0) {
+        } else if (rects.home.top === 0) {
             currentPage = scriptsPage;
-        } else if (scriptsRect.top === 0) {
+        } else if (rects.scripts.top === 0) {
             currentPage = visualizerMain;
         }
     } else {
-        if (featuresEditRect.x <= (window.innerWidth / 1.5) && featuresEditRect.top === 0) {
+        if (inViewportFromSide(rects.featuresEdit)) {
             currentPage = scriptsPage;
-        } else if (visualizerStartRect.x <= (window.innerWidth / 1.5) && visualizerStartRect.top === 0) {
+        } else if (inViewportFromSide(rects.visStart)) {
             currentPage = visualizerMain;
-        } else if (visualizerStatsRect.top === 0) {
+        } else if (rects.visStats.top === 0) {
             currentPage = visualizerMain;
-        } else if (visualizerMainRect.top === 0) {
+        } else if (rects.visMain.top === 0) {
             currentPage = scriptsPage;
-        } else if (scriptsRect.top === 0) {
+        } else if (rects.scripts.top === 0) {
             currentPage = homePage;
         }
     }

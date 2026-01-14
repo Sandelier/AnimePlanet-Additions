@@ -175,10 +175,12 @@ function createScriptsPage(contentScripts) {
                 const jsonEditor = document.getElementById('featuresEditor');
 
                 if (typeof data !== "object") {
-                    jsonEditor.dataset.key = "";
+                    jsonEditor.dataset.key = script.changeableData;
+                    jsonEditor.dataset.formattedKey = script.formattedName;
                     setJsonEditor({ [script.changeableData]: data });
                 } else {
                     jsonEditor.dataset.key = [script.changeableData];
+                    jsonEditor.dataset.formattedKey = script.formattedName;
                     setJsonEditor(data);
                 }
             });

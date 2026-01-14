@@ -4,7 +4,7 @@
   {
     "manifest_version": 3,
     "name": "Animeplanet Additions",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "description": "Extension to add features and fixing inconveniences i have had with animeplanet.",
     "permissions": [
       "scripting",
@@ -81,13 +81,13 @@
     "browser_specific_settings": {
       "gecko": {
         "id": "animeplanet-additions@sandelier.com",
-        "strict_min_version": "126.0",
+        "strict_min_version": "142.0",
         "data_collection_permissions": {
           "required": ["none"]
         }
       },
       "gecko_android": {
-        "strict_min_version": "131.0",
+        "strict_min_version": "142.0",
         "data_collection_permissions": {
           "required": ["none"]
         }

@@ -25,7 +25,7 @@ You can enable/disable features on the options page of the addon. You can access
 ### Acknowledgements
 * **Mangaupdates** ([https://api.mangaupdates.com/](https://api.mangaupdates.com/)): Mangaupdates api is used for "Extra manga data" feature to fetch manga data
 * **Chart.js** ([https://www.chartjs.org/](https://www.chartjs.org/)): Chart.js is used to make charts lot easier in option page.
-
+* **Prism.js** ([https://prismjs.com/](https://prismjs.com/)): Prism.js is used to have syntax highlighting for features editor
 
 ## Features
 

@@ -15,11 +15,16 @@
         const mangaBtn = document.getElementById('mangaType');
         const animeBtn = document.getElementById('animeType');
         const scrapeBtn = document.getElementById('scrapeBtn');
+        const rawDataBtn = document.getElementById('rawDataBtn');
     
         function switchDataType(btn) {
             visualizerStart.querySelectorAll('.dataTypeSelected').forEach(el => el.classList.remove('dataTypeSelected'));
             btn.classList.add('dataTypeSelected');
         }
+
+        rawDataBtn.addEventListener('click', function() {
+            rawDataBtn.classList.toggle("rawDataSelected");
+        });
     
         mangaBtn.addEventListener('click', function() {
             switchDataType(mangaBtn);
@@ -47,6 +52,7 @@
             if (!stillScraping) {
     
                 const selectedType = document.querySelector('.dataTypeSelected').textContent.trim().toLowerCase();
+                const rawDataSelected = rawDataBtn.classList.contains('rawDataSelected');
     
     
                 const username = usernameField.value.trim();
@@ -64,7 +70,7 @@
                 stillScraping = true;
 
 
-                browser.runtime.sendMessage({ action: "scrapeUser", requestType: "", value: {username: username, dataType: selectedType}});
+                browser.runtime.sendMessage({ action: "scrapeUser", requestType: "", value: {username: username, dataType: selectedType, rawDataSelected: rawDataSelected}});
             }
         });
     
@@ -72,6 +78,20 @@
             if (message.action === "scrapedData") {
                 stillScraping = false;
                 scrapeBtn.classList.toggle('deactivatedBtn');
+
+                if (rawDataBtn.classList.contains('rawDataSelected') && message.data?.rawData) {
+                    const rawData = JSON.stringify(message.data.rawData, null, 2);
+
+                    const rawBlob = new Blob([rawData], { type: "application/json" });
+
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(rawBlob);
+                    a.download = `${message.data.dataType}-rawData.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a); 
+                }
+                delete message.data.rawData;
     
                 const storageKey = `stats-${message.data.dataType}`;
                 browser.storage.local.set({ [storageKey]: JSON.stringify(message.data) });
@@ -385,6 +405,7 @@
             .then((result) => {
                 document.getElementById('featuresEditPage').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('featuresEditor').dataset.key = "timeCalcMap";
+                document.getElementById('featuresEditor').dataset.formattedKey = "Time calculation map";
 
                 setJsonEditor(result.timeCalcMap, "Visualizer", false, false);
             })

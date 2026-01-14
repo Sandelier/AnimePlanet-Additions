@@ -10,6 +10,7 @@ var browser = browser || chrome;
 // No priority: Last to be injected
 
 browser.runtime.onInstalled.addListener((details) => {
+
     const defaultSettings = {
         
         customTags: {},
@@ -37,13 +38,23 @@ browser.runtime.onInstalled.addListener((details) => {
         },
 
         autoFilters: {
-            "tags": {
-              "Sexual Content": "-",
-              "Mature Themes": "+",
-              "Emotional Abuse": "-"
+            "manga": {
+                "tags": {
+                  "Sexual Content": "-",
+                  "Mature Themes": "+",
+                  "Emotional Abuse": "-"
+                },
+                "other": ["Completed"],
+                "mylist": ["Read"]
             },
-            "other": ["Completed"],
-            "mylist": ["Read", "Reading"]
+            "anime": {
+                "tags": {
+                  "Action": "-",
+                  "Fantasy": "+",
+                },
+                "other": ["Completed"],
+                "mylist": ["Watched"]
+            }
         },
     
         contentScripts: {
@@ -384,5 +395,50 @@ browser.runtime.onInstalled.addListener((details) => {
 
     if (details.reason === "install") {
         browser.runtime.openOptionsPage();
+
+    } else if (details.reason === "update") {
+        const currentVersion = browser.runtime.getManifest().version;
+        const previousVersion = details.previousVersion;
+
+        function isVersionLessOrEqual(previous, target) {
+            const toParts = (ver) => ver.split(".").map(n => parseInt(n, 10) || 0);
+            const previousParts = toParts(previous);
+            const targetParts = toParts(target);
+
+            for (let i = 0; i < Math.max(previousParts.length, targetParts.length); i++) {
+                const diff = (previousParts[i] || 0) - (targetParts[i] || 0);
+                if (diff !== 0) return diff < 0;
+            }
+            return true;
+        }
+
+
+        // In 2.0.4 there is new autofilters structure
+        if (isVersionLessOrEqual(previousVersion, "2.0.3")) {
+
+            browser.storage.local.get(["autoFilters"], (result) => {
+                const storedAutoFilters = result.autoFilters;
+            
+                if (!storedAutoFilters) {
+                    browser.storage.local.set({autoFilters: structuredClone(defaultSettings.autoFilters)});
+                    return;
+                }
+            
+                const newAutofilter = {
+                    manga: {
+                        tags: storedAutoFilters.tags ?? {},
+                        other: storedAutoFilters.other ?? [],
+                        mylist: storedAutoFilters.mylist ?? []
+                    },
+                    anime: {
+                        tags: storedAutoFilters.tags ?? {},
+                        other: storedAutoFilters.other ?? [],
+                        mylist: storedAutoFilters.mylist ?? []
+                    }
+                };
+            
+                browser.storage.local.set({ autoFilters: newAutofilter });
+            });
+        }
     }
 });

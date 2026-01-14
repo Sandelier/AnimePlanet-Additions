@@ -4,14 +4,23 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>AP-Additions - Options</title>
+
+        <link rel="stylesheet" href="libs/prism/prism.css" />
+        <script src="libs/prism/prism.js"></script>
+
+        <link rel="stylesheet" href="styles/defaults.css">
+        <link rel="stylesheet" href="styles/homePage.css">
+        <link rel="stylesheet" href="styles/scriptsPage.css">
         <link rel="stylesheet" href="styles/featuresEdit.css">
-        <link rel="stylesheet" href="styles/styles.css">
+        <link rel="stylesheet" href="styles/visualizer.css">
+
+
         <script src="stylingScript.js" defer></script>
         <script src="script.js" defer></script>
         <script src="featuresEdit.js" defer></script>
         <script src="visualizer/visualizer-main.js" defer></script>
         <script src="visualizer/visualizer-stats.js" defer></script>
-        <script src="visualizer/chart.js"></script>
+        <script src="libs/chartjs/chart.js"></script>
     </head>
     <body>
         <div id="mainContent">
@@ -39,7 +48,8 @@
                         <span>Github</span>
                     </a>
                 </div>
-                <h1 id="extVersion"></h1>
+                <h1 id="nextVersion"></h1>
+                <div class="spaceWaster"></div>
             </div>
             <div id="scriptsPage">
                 <div id="featuresContainer">
@@ -49,10 +59,18 @@
                 </div>
                 <div id="featuresEditPage">
                     <h1>Feature settings</h1>
-                    <button id="feature-saveBtn" class="defaultBtnStyle">
-                        <span>Save</span>
-                    </button>
-                    <div id="featuresEditor"></div>
+                    <div id="editorHeader">
+                        <span>Name</span>
+                        <button id="feature-saveBtn" class="defaultBtnStyle">
+                            <span>Save</span>
+                        </button>
+                    </div>
+
+                    
+                    <div id="editorContainer">
+                        <pre id="jsonHighlight" class="language-json"></pre>
+                        <textarea id="featuresEditor" spellcheck="false"></textarea>
+                    </div>
                 </div>
             </div>
             <div id="visualizerPage">
@@ -75,7 +93,8 @@
                     </div>
                 </div>
                 <div id="visualizerStart">
-                    <p>Provide username and select data type to start scraping data from their list</p>
+                    <p>Provide username and select data type to start scraping data from their list.</p>
+                    <p>Enable "Raw Data" if you want to get the raw data as an file before its processed.</p>
                     <div>
                         <input id="visualizerStart-usernameField" placeholder="Username" type="text">
                         <div>
@@ -87,9 +106,15 @@
                             </button>
                         </div>
                     </div>
-                    <button id="scrapeBtn" class="defaultBtnStyle">
-                        <span>Start scraping</span>
-                    </button>
+                    <div>
+                        <button id="rawDataBtn" class="defaultBtnStyle">
+                            <span>Raw Data</span>
+                        </button>
+
+                        <button id="scrapeBtn" class="defaultBtnStyle">
+                            <span>Start scraping</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div id="visualizerStats">

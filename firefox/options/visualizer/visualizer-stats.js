@@ -457,9 +457,8 @@ function makeRatingChart(dataType, userRatingData, userbaseRatingData, toAppend)
     });
 }
 
-
-
 function makeActivityChart(installmentType, dataType, data) {
+
 
     let dataTest = data ? Object.keys(data).length : null;
     if (!isEnoughData(dataType, dataTest)) return;

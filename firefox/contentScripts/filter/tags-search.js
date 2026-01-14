@@ -74,6 +74,11 @@
         tagsField.style.setProperty('padding-top', '1em', 'important');
         tagsField.style.setProperty('padding-bottom', '1em', 'important');
 
+        // Animeplanet will add an keyup listener to input elements
+        searchTagElement.addEventListener('keyup', e => {
+            e.stopImmediatePropagation();
+        });
+
         tagsField.insertBefore(searchTagElement, tagsField.firstChild);
 
         searchFunctionality(searchTagElement, tags, tagMap);

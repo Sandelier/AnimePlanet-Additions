@@ -329,7 +329,12 @@
 				const dataContainer = document.querySelector('section#entry.pure-g.EntryPage__content div.pure-1.md-2-3 div.pure-1.md-3-5');
 
 				const synopsisEles = dataContainer.querySelectorAll('.synopsisManga');
-				const lastSynopsisEle = synopsisEles[synopsisEles.length - 1];
+				let lastSynopsisEle = synopsisEles[synopsisEles.length - 1];
+
+				// Would be null if animeplanet and mangaupdates didin't have an description
+				if (!lastSynopsisEle) {
+					lastSynopsisEle = dataContainer.querySelector('p');
+				}
 
 				// creating notes div if it dosent exist.
 				let notesDiv = dataContainer.querySelector('div.notes');

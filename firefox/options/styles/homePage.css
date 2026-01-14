@@ -1,0 +1,34 @@
+#homePage {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	widtH: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	background: linear-gradient(to top, #f1ffab, #ffd8b1);
+	text-align: center;
+	position: relative;
+}
+
+#homePage>div {
+	user-select: none;
+}
+
+#homePage>#nextVersion {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 5px;
+	font-size: 18px;
+}
+
+@media (max-width: 836px) {
+	#homePage>div {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 10px;
+		width: 100%;
+	}
+}

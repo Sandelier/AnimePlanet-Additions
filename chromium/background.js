@@ -12,7 +12,10 @@ var browser = browser || chrome;
 const filterScriptsAllowedUrls = [
     "https://www.anime-planet.com/manga/all",
     "https://www.anime-planet.com/anime/all",
-    "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)"
+    "https:\/\/www\.anime-planet\.com\/users\/[^\/]+\/(?:manga|anime)",
+
+    "https:\/\/www\.anime-planet\.com\/anime\/(studios|tags)\/.+$",
+    "https:\/\/www\.anime-planet\.com\/manga\/(magazines|publishers|tags)\/.+$"
 ]
 
 // Have to make an function since theres just too many similar urls so we cant just do an one regex
