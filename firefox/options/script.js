@@ -1,7 +1,4 @@
 
-const browserType = typeof browser !== "undefined" ? "firefox" : "chrome";
-var browser = browser || chrome;
-
 async function requestPermissions(permissions, origins = []) {
     try {
         const granted = await browser.permissions.request({ permissions, origins });
@@ -228,6 +225,12 @@ function createScriptsPage(contentScripts) {
 
         cardContainer.addEventListener('mouseleave', () => {
             cardTooltip.style.visibility = 'hidden';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.option-card')) {
+                cardTooltip.style.visibility = 'hidden';
+            }
         });
 
 

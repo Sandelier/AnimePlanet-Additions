@@ -70,6 +70,9 @@
                     <div id="editorContainer">
                         <pre id="jsonHighlight" class="language-json"></pre>
                         <textarea id="featuresEditor" spellcheck="false"></textarea>
+                        <button id="featuresEditor-returnBtn" class="defaultBtnStyle">
+                            <span>Return</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -78,7 +81,7 @@
                     <h1>AP Visualizer</h1>
                     <p>Scrapes an list and visualizes the data from it</p>
                     <div>
-                        <button id="visualizer-startBtn" class="defaultBtnStyle">
+                        <button id="startScraping" class="defaultBtnStyle">
                             <span>Start</span>
                         </button>
                         <button id="visualizer-animeStatsBtn" class="defaultBtnStyle deactivatedBtn">
@@ -92,11 +95,11 @@
                         </button>
                     </div>
                 </div>
-                <div id="visualizerStart">
+                <div id="scraperPage">
                     <p>Provide username and select data type to start scraping data from their list.</p>
                     <p>Enable "Raw Data" if you want to get the raw data as an file before its processed.</p>
                     <div>
-                        <input id="visualizerStart-usernameField" placeholder="Username" type="text">
+                        <input id="scraperPage-usernameField" placeholder="Username" type="text">
                         <div>
                             <button id="mangaType" class="defaultBtnStyle dataTypeSelected">
                                 <span>Manga</span>
@@ -163,15 +166,17 @@
                                 <span>Activity Map</span>
                             </button>
                         </div>
-                        <div id="visualizerStats-limiter-container">
-                            <input id="visualizerStats-limiter" type="text" value="1" min="1">
-                            <div class="limiter-arrows">
-                                <button class="limiter-up">▲</button>
-                                <button class="limiter-down">▼</button>
+                        <div id="visualizerStats-filtersContainer">
+                            <div id="visualizerStats-limiter-container">
+                                <input id="visualizerStats-limiter" type="text" value="1" min="1">
+                                <div class="limiter-arrows">
+                                    <button class="limiter-up">▲</button>
+                                    <button class="limiter-down">▼</button>
+                                </div>
                             </div>
-                        </div>
-                        <div id="visualizerStats-searchBar-container">
-                            <input id="visualizerStats-searchBar" type="text" placeholder="Search label">
+                            <div id="visualizerStats-searchBar-container">
+                                <input id="visualizerStats-searchBar" type="text" placeholder="Search label">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -189,7 +194,7 @@
                         </div>
                     </div>
 
-                    <div chart-type="activity" currentlimit="0" maxlimit="hide" searchbar="false" dontRemove>
+                    <div chart-type="activity" currentlimit="0" maxlimit="hide" searchbar="false" id="activityChart" dontRemove>
                         <div id="heatmap-container">
                             <div id="yearsHeatmap"></div>
                             <div id="monthsHeatmap"></div>

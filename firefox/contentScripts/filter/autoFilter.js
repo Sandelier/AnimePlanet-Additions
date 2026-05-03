@@ -15,7 +15,7 @@
     // filters is an array.
     function applyOthers(container, filters) {
         if (container && filters) {
-            const filterElements = container.querySelectorAll('li.filter.n > a');
+            const filterElements = container.querySelectorAll('li.filter > a');
             
             filters = filters.map(filter => filter.toLowerCase());
             
@@ -53,25 +53,10 @@
     }
 
 
-    // Listeners for tags get added late in the dom so we cant listen for a specific element to be added so have to do it like this
-    function createCheckerElement() {
-        const tag = document.createElement('li');
-        tag.className = 'filter ternary n';
-        tag.style.display = "none";
-
-        const tagText = document.createElement('a');
-        tagText.textContent = 'Checker';
-
-        tag.appendChild(tagText);
-        tagsContainer.querySelector('ul').appendChild(tag);
-
-        return tagText;
-    }
-
     function checkerPillExists() {
         const pills = document.querySelectorAll('div.pillFilters div.pillBottle a.pill');
         for (const pill of pills) {
-            if (pill.textContent.trim() === "Checker") {
+            if (pill.textContent.trim() === "Zoo") {
                 pill.remove();
                 return true;
             }
@@ -79,22 +64,27 @@
         return false;
     }
 
-    async function waitForCheckerPill() {
+    async function waitForZooTag() {
         return new Promise(resolve => {
-            const checker = createCheckerElement();
-            if (!checker) {
-                console.error("Failed to create checker element");
-                resolve(false);
-                return;
-            }
+            const moreTagsCont = tagsContainer.querySelector("#advanced_more_tags");
 
             function check() {
-                if (checkerPillExists()) {
-                    resolve(true);
-                    return;
-                }
 
-                checker.click();
+                const tags = moreTagsCont.querySelectorAll("a");
+
+                for (const tag of tags) {
+                    if (tag.textContent.trim() === "Zoo") {
+
+                        if (checkerPillExists()) {
+                            tag.previousElementSibling.click();
+                            resolve(true);
+                            return;
+                        }
+
+                        tag.previousElementSibling.click();
+                        break;
+                    }
+                }
 
                 setTimeout(check, 20);
             };
@@ -129,8 +119,8 @@
                 }
 
                 const autoFilters = response.value[pageType];
-
-                await waitForCheckerPill();
+                checkerPillExists()
+                await waitForZooTag();
 
                 applyOthers(otherContainer, autoFilters["other"]);
                 applyOthers(mylistContainer, autoFilters["mylist"]);

@@ -1,4 +1,6 @@
 
+var browser = browser || chrome;
+
 export function processData(jsonData, backupData = null, rawDataSelected = false) {
 	try {
 

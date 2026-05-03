@@ -493,11 +493,11 @@ function makeActivityChart(installmentType, dataType, data) {
 
         // position
         const rect = ele.getBoundingClientRect();
-        const scrollY = window.scrollY;
-        const scrollX = window.scrollX;
+        const statsCont = document.querySelector('#visualizerStats');
+        const statsContRect = statsCont.getBoundingClientRect();
 
-        heatmapTooltip.style.top = `${scrollY + rect.top - heatmapTooltip.offsetHeight - 8}px`;
-        heatmapTooltip.style.left = `${scrollX + rect.left + rect.width / 2 - heatmapTooltip.offsetWidth / 2}px`;
+        heatmapTooltip.style.top = `${statsCont.scrollTop + (rect.top - statsContRect.top) - heatmapTooltip.offsetHeight - 8}px`;
+        heatmapTooltip.style.left = `${statsCont.scrollLeft + (rect.left - statsContRect.left) + rect.width / 2 - heatmapTooltip.offsetWidth / 2}px`;
         heatmapTooltip.style.visibility = 'visible';
         heatmapTooltip.style.opacity = '1';
     }
@@ -506,9 +506,25 @@ function makeActivityChart(installmentType, dataType, data) {
         ele.addEventListener('mouseenter', () => {
             showTooltip(ele, label, installments, entries, time, volumeCount);
         });
-        ele.addEventListener('mouseleave', () => {
+
+        ele.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            showTooltip(ele, label, installments, entries, time, volumeCount);
+        });
+
+        const hideTooltip = () => {
             heatmapTooltip.style.opacity = '0';
             heatmapTooltip.style.visibility = 'hidden';
+        }
+
+        ele.addEventListener('mouseleave', () => {
+            hideTooltip()
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (!ele.contains(e.target)) {
+                hideTooltip()
+            }
         });
     }
     //

@@ -1,24 +1,24 @@
 
 	
 (function(){
-    const visualizerStartBtn = document.getElementById('visualizer-startBtn');
-    const visualizerStart = document.getElementById('visualizerStart');
+    const scraperPageBtn = document.getElementById('startScraping');
+    const scraperPage = document.getElementById('scraperPage');
 
-    if (visualizerStart) {
-        visualizerStartBtn.addEventListener('click', (event) => {
-            visualizerStart.scrollIntoView({ behavior: 'smooth' });
+    if (scraperPage) {
+        scraperPageBtn.addEventListener('click', (event) => {
+            scraperPage.scrollIntoView({ behavior: 'smooth' });
         });    
     
     
         // Visualizer start
-        const usernameField = document.getElementById('visualizerStart-usernameField');
+        const usernameField = document.getElementById('scraperPage-usernameField');
         const mangaBtn = document.getElementById('mangaType');
         const animeBtn = document.getElementById('animeType');
         const scrapeBtn = document.getElementById('scrapeBtn');
         const rawDataBtn = document.getElementById('rawDataBtn');
     
         function switchDataType(btn) {
-            visualizerStart.querySelectorAll('.dataTypeSelected').forEach(el => el.classList.remove('dataTypeSelected'));
+            scraperPage.querySelectorAll('.dataTypeSelected').forEach(el => el.classList.remove('dataTypeSelected'));
             btn.classList.add('dataTypeSelected');
         }
 
@@ -189,7 +189,7 @@
         // Chart btn switch logic
 		function handleChartBtns(e) {
 			const target = e.target.closest('button[data-chart]');
-			if (!target || !currentStats || document.getElementById('visualizerStart').getAttribute("datatype") !== currentType) return;
+			if (!target || !currentStats || document.getElementById('scraperPage').getAttribute("datatype") !== currentType) return;
 
             if (target.classList.contains('deactivatedBtn')) return;
 
@@ -239,8 +239,13 @@
     
             button.addEventListener('click', function() {
                 if (!button.classList.contains('deactivatedBtn')) {
+
+                    const questionsInfo = document.querySelector('#questionsInfo');
+                    const visualizerStatsCenter = document.querySelector('#visualizerStats-center');
+                    const height = questionsInfo.offsetHeight;
+                    visualizerStatsCenter.style.height = height + 'px';
+
                     visualizerStats.scrollIntoView({ behavior: "smooth" });
-    
                     let visualizerCenter = document.getElementById('visualizerStats-center');
     
                     [...visualizerCenter.children].forEach(el => {
@@ -296,14 +301,15 @@
                         makeDoughnutChart("sources", sourcesProcessed, visualizerCenter);
                         makeDoughnutChart("types", typesProcessed, visualizerCenter);
 
-                        makeStackedBarChart("serializers", serializersProcessed, visualizerCenter, 10);
-                        makeStackedBarChart("years", yearsProcessed, visualizerCenter, 30);
-                        makeStackedBarChart("tags", tagsProcessed, visualizerCenter, 15);
+                        let dynamicLimit = window.innerWidth < 836 ? 4 : null;
+                        makeStackedBarChart("serializers", serializersProcessed, visualizerCenter, dynamicLimit || 10);
+                        makeStackedBarChart("years", yearsProcessed, visualizerCenter, dynamicLimit || 30);
+                        makeStackedBarChart("tags", tagsProcessed, visualizerCenter, dynamicLimit || 15);
 
                         makeRatingChart("ratings", stats?.ratings?.user, stats?.ratings?.userbase, visualizerCenter);
                         makeActivityChart(type, "activity", stats?.consumptionByMonth);
 
-                        visualizerStart.setAttribute('dataType', type);
+                        scraperPage.setAttribute('dataType', type);
         
                         document.querySelector('#visualizerStats-header h1').textContent = `${stats.username}'s ${type} list`;
                         document.querySelector('#visualizerStats-header p').textContent = timeSince(stats.dataDate);
@@ -380,7 +386,7 @@
     
         // Export json
         document.getElementById('visualizer-exportJson').addEventListener('click', function() {
-            let dataType = visualizerStart.getAttribute('dataType');
+            let dataType = scraperPage.getAttribute('dataType');
             
             browser.storage.local.get([`stats-${dataType}`], (result) => {
                 const stats = JSON.parse(result[`stats-${dataType}`]);

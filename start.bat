@@ -20,9 +20,9 @@ set /p runAndroid="Do you want to run as Android? (y/any): "
 
 if /i "%browserChoice%"=="c" (
     if /i "%runAndroid%"=="y" (
-        web-ext run --target=chromium --source-dir=chromiumTemp --args="--user-agent='Mozilla/5.0 (Android 13; Mobile; rv:120.0) Gecko/120.0 Firefox/120.0'"
+        web-ext run --target=chromium --source-dir=chromiumTemp --args="--lang=en-US --user-agent='Mozilla/5.0 (Android 13; Mobile; rv:120.0) Gecko/120.0 Firefox/120.0'"
     ) else (
-        web-ext run --target=chromium --source-dir=chromiumTemp
+        web-ext run --target=chromium --source-dir=chromiumTemp --args="--lang=en-US"
     )
 ) else (
     if /i "%runAndroid%"=="y" (

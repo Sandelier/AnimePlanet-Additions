@@ -1,4 +1,5 @@
-
+const browserType = typeof browser !== "undefined" ? "firefox" : "chrome";
+var browser = browser || chrome;
 
 document.getElementById('nextVersion').textContent = `Version: ${browser.runtime.getManifest().version}`;
 
@@ -12,6 +13,7 @@ document.addEventListener('wheel', (event) => {
 
 document.addEventListener('touchstart', (event) => {
     touchStartY = event.touches[0].clientY;
+    touchEndY = touchStartY;
 });
 
 document.addEventListener('touchmove', (event) => {
@@ -20,6 +22,11 @@ document.addEventListener('touchmove', (event) => {
 
 document.addEventListener('touchend', (event) => {
     const deltaY = touchStartY - touchEndY;
+
+    if (Math.abs(deltaY) < 50) {
+        return;
+    }
+
     handleScroll(deltaY, event);
 });
 
@@ -43,7 +50,7 @@ const scriptsPage = document.getElementById('scriptsPage');
 const visualizerMain = document.getElementById('visualizerMain');
 const homePage = document.getElementById('homePage');
 const visualizerStats = document.getElementById('visualizerStats');
-const visualizerStart = document.getElementById('visualizerStart');
+const scraperPage = document.getElementById('scraperPage');
 const featuresEditPage = document.getElementById('featuresEditPage');
 homePage.scrollIntoView();
 
@@ -99,7 +106,7 @@ function handleScroll(deltaY, event) {
         scripts: scriptsPage.getBoundingClientRect(),
         featuresEdit: featuresEditPage.getBoundingClientRect(),
         visMain: visualizerMain.getBoundingClientRect(),
-        visStart: visualizerStart.getBoundingClientRect(),
+        visStart: scraperPage.getBoundingClientRect(),
         visStats: visualizerStats.getBoundingClientRect(),
     };
 
@@ -144,5 +151,11 @@ const visualizerBtn = document.getElementById('visualizerBtn');
 visualizerBtn.addEventListener('click', (event) => {
     if (!visualizerBtn.classList.contains('deactivatedBtn')) {
         visualizerPage.scrollIntoView({ behavior: 'smooth' });
+        currentPage = visualizerPage;
     }
+});
+
+
+document.getElementById('featuresEditor-returnBtn').addEventListener('click', (event) => {
+    currentPage.scrollIntoView({ behavior: 'smooth' });
 });

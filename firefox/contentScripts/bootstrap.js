@@ -1,5 +1,7 @@
 // Initial injection at the start of an page so we dont need any webnavigation/tab permissions
 
+var browser = browser || chrome;
+
 browser.runtime.sendMessage({
     action: "bootstrap",
     value: window.location.href,

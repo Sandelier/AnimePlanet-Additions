@@ -215,6 +215,16 @@
                             tooltip.textContent = customTitle.title;
                         }
                     }
+
+
+                    // Title in tooltip.
+                    if (item.parsedTitle) {
+                        const name = item.parsedTitle.firstElementChild;
+                        name.textContent = customTitle.title;
+                        name.setAttribute('style', 'font-style: italic;');
+
+                        item.tooltip.setAttribute('title', item.parsedTitle.innerHTML);
+                    }
                 }
             });
         }

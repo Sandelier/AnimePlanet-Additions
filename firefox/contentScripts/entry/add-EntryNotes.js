@@ -147,6 +147,7 @@
                     const note = entriesData[type][id]?.note || "";
 
                     addNoteIcon(tooltipImage, note);
+                    addNoteTooltipText(item, note);
                 });
             } else {
                 console.log('Failed to retrieve entries');
@@ -156,6 +157,33 @@
         }
     })();
 
+
+    function addNoteTooltipText(item, note) {
+        if (!item.parsedTitle) return;
+
+        if (note) {
+            const noteElement = document.createElement('div');
+
+            const h4 = document.createElement('h4');
+            h4.style.marginBottom = '0';
+            h4.textContent = 'Notes';
+
+            const p = document.createElement('p');
+            p.style.marginTop = '0';
+            
+            p.textContent = note.length > 500 ? note.slice(0, 500) + '…' : note;
+
+            noteElement.appendChild(h4);
+            noteElement.appendChild(p);
+
+            item.parsedTitle.appendChild(noteElement);
+
+            const tagsCont = item.parsedTitle.querySelector('div.tags');
+            item.parsedTitle.insertBefore(noteElement, tagsCont);
+        }
+
+        item.tooltip.setAttribute('title', item.parsedTitle.innerHTML);
+    }
 
 
     // Just add an mail icon to the bottom right corner of an tooltip if you have note in it
